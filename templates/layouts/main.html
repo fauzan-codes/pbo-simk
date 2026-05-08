@@ -59,3 +59,15 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+    <script>
+        $(document).ready(function() {
+            $('.select-with-search').select2({
+                width: '100%',
+                placeholder: "Pilih opsi...", 
+                allowClear: false
+            });
+        });
+    </script>
+{% endblock %}

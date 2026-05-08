@@ -11,6 +11,8 @@ class JadwalPraktik(models.Model):
     jam_mulai = models.TimeField() 
     jam_selesai = models.TimeField()
 
+    
+
 class TindakanMedis(models.Model):
     kode_tindakan = models.CharField(max_length=10, unique=True)
     nama_tindakan = models.CharField(max_length=100)

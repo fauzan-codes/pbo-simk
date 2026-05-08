@@ -16,7 +16,7 @@
 
         <form method="POST">
             {% csrf_token %}
-            <div class="grid md:grid-cols-2 gap-6 w-full">
+            <div class="grid md:grid-cols-2 gap-x-6 w-full">
                 <div>
                     {% include 'components/ui/input.html' with label="Nama Tindakan" name="nama_tindakan" value=tindakan.nama_tindakan required=True  %}
                 </div>

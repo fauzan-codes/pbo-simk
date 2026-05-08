@@ -2,9 +2,10 @@ from django.contrib import admin
 from django.urls import path
 from accounts import views as accounts_views
 from master_data import views as master_data_views
+from farmasi import views as farmasi_views
 
 urlpatterns = [
-    # Account App Route
+    # Account Route
     path('generate-super-admin/', accounts_views.generate_superadmin, name='generate_super_admin'),
 
     path('admin/', admin.site.urls),
@@ -44,4 +45,15 @@ urlpatterns = [
     path('tindakan/create', master_data_views.tindakan_medis_create, name="tindakan_medis_create"),
     path('tindakan/<int:id>/edit', master_data_views.tindakan_medis_edit, name="tindakan_medis_edit"),
     path('tindakan/<int:id>/delete', master_data_views.tindakan_medis_delete, name="tindakan_medis_delete"),
+
+    path('jadwal/', master_data_views.jadwal_praktik_index, name="jadwal_praktik_index"),
+    path('jadwal/create', master_data_views.jadwal_praktik_create, name="jadwal_praktik_create"),
+    path('jadwal/<int:id>/edit', master_data_views.jadwal_praktik_edit, name="jadwal_praktik_edit"),
+    path('jadwal/<int:id>/delete', master_data_views.jadwal_praktik_delete, name="jadwal_praktik_delete"),
+
+    # Farmasi Route
+    path('kategori-obat/', farmasi_views.kategori_obat_index, name="kategori_obat_index"),
+    path('kategori-obat/create', farmasi_views.kategori_obat_create, name="kategori_obat_create"),
+    path('kategori-obat/<int:id>/edit', farmasi_views.kategori_obat_edit, name="kategori_obat_edit"),
+    path('kategori-obat/<int:id>/delete', farmasi_views.kategori_obat_delete, name="kategori_obat_delete"),
 ]

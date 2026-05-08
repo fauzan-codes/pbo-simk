@@ -1,0 +1,95 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+        {% include 'components/ui/breadcrumbs.html' %}
+    </div>
+    
+    <div>
+        <a href="{% url 'jadwal_praktik_create' %}">
+            {% include 'components/ui/button.html' with variant='primary' label='+ Tambah Jadwal' %}
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6 items-start">
+    
+    {% for hari, jadwal_list in jadwal_dict.items %}
+    <div class="flex flex-col gap-4">
+        
+        <div class="bg-white text-slate-600 text-center py-3 rounded-2xl font-bold shadow-sm sticky top-8 z-10">
+            {{ hari }}
+        </div>
+
+        <div class="flex flex-col gap-3">
+            {% for jadwal in jadwal_list %}
+            <div class="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative group overflow-hidden">
+                
+                <div class="text-xs font-bold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-lg inline-block mb-3 border border-sky-100">
+                    {{ jadwal.jam_mulai|time:"H:i" }} - {{ jadwal.jam_selesai|time:"H:i" }}
+                </div>
+                
+                <h3 class="font-bold text-slate-800 text-sm leading-tight mb-1">
+                    {{ jadwal.dokter.user.full_name }}
+                </h3>
+                <p class="text-xs font-medium text-slate-500">
+                    {{ jadwal.poli.nama_poli }}
+                </p>
+
+                <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex bg-white/90 backdrop-blur-sm rounded-lg shadow-sm border border-slate-100">
+                    <a href="{% url 'jadwal_praktik_edit' jadwal.id %}" class="p-1.5 text-slate-400 hover:text-sky-600 transition-colors" title="Edit">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </a>
+                    <div class="w-px bg-slate-100 my-1"></div>
+                    <button onClick="confirmDelete('{{ jadwal.id }}', 'Jadwal {{ jadwal.dokter.user.full_name|escapejs }}')" class="p-1.5 text-slate-400 hover:text-red-600 transition-colors" title="Hapus">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-sky-500 rounded-l-2xl"></div>
+            </div>
+            {% empty %}
+            <div class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                <span class="text-sm font-medium text-slate-400">Libur / Kosong</span>
+            </div>
+            {% endfor %}
+        </div>
+        
+    </div>
+    {% endfor %}
+</div>
+
+{% block extra_js %}
+<script>
+    function confirmDelete(id, textInfo) {
+        Swal.fire({
+            title: 'Hapus Jadwal?',
+            text: `${textInfo} akan dihapus permanen.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#0284c7', 
+            cancelButtonColor: '#ef4444',  
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-3xl',
+                confirmButton: 'rounded-xl px-6 py-2.5 font-semibold',
+                cancelButton: 'rounded-xl px-6 py-2.5 font-semibold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = `/jadwal/${id}/delete`; 
+            }
+        })
+    }
+</script>
+{% endblock %}
+{% endblock %}

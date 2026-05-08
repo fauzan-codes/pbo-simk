@@ -17,7 +17,7 @@
         <form action="" method="POST">
             {% csrf_token %}
             
-            <div class="grid md:grid-cols-2 gap-6 w-full">
+            <div class="grid md:grid-cols-2 gap-x-6 w-full">
                 <div>
                     {% include 'components/ui/input.html' with label="Nama Metode Pembayaran" name="nama_metode" value=metode.nama_metode required=True  %}
                 </div>

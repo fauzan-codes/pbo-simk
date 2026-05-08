@@ -1,0 +1,42 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+<div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
+    <form action="{% url 'jadwal_praktik_create' %}" method="POST" class="flex flex-col">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-6 gap-x-6">
+            <div class="md:col-span-3 col-span-6">
+                {% include 'components/ui/select.html' with label="Pilih Dokter" name="dokter_id"  placeholder="-- Pilih Dokter --"  required=True  options=dokter_options  %}
+            </div>
+            <div class="md:col-span-3 col-span-6">
+                {% include 'components/ui/select.html' with label="Poliklinik"  name="poli_id"  placeholder="-- Pilih Poli --" required=True options=poli_options  %}
+            </div>
+            <div class="md:col-span-2 col-span-6">
+                {% include 'components/ui/select.html' with label="Hari Praktik" name="hari"  placeholder="-- Pilih Hari --" required=True options=hari_options %}
+            </div>
+            
+            <div class="md:col-span-2 col-span-6">
+                {% include 'components/ui/input.html' with label="Jam Mulai"  name="jam_mulai" type="time" required=True %}
+            </div>
+            
+            <div class="md:col-span-2 col-span-6">
+                {% include 'components/ui/input.html' with label="Jam Selesai" name="jam_selesai" type="time" required=True %}
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-6 mt-2 border-t border-slate-100">
+            {% include 'components/ui/button.html' with label="Batal" variant="ghost" onClick="window.history.back()" %}
+
+            {% include 'components/ui/button.html' with label="Simpan Jadwal" type="submit" variant="primary" %}
+        </div>
+    </form>
+</div>
+{% endblock %}
