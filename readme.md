@@ -24,6 +24,18 @@ install django
     pip install django
 ```
 
+install tailwindcss
+
+```
+    pip install django-tailwind
+```
+```
+    python manage.py tailwind init
+```
+```
+    python manage.py tailwind install
+```
+
 start server
 
 ```
