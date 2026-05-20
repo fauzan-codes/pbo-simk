@@ -34,3 +34,4 @@ class StaffForm(forms.Form):
     shift_kerja = forms.CharField(max_length=150)
     no_hp = forms.CharField(max_length=15)
     alamat = forms.CharField(widget=forms.Textarea)
+

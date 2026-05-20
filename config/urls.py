@@ -3,6 +3,8 @@ from django.urls import path
 from accounts import views as accounts_views
 from master_data import views as master_data_views
 from farmasi import views as farmasi_views
+from dashboard import views as dashboard_views
+from administrasi import views as administrasi_views
 
 urlpatterns = [
     # Account Route
@@ -13,7 +15,6 @@ urlpatterns = [
     path('login/', accounts_views.login_view,    name='login'),
     path('register/', accounts_views.register_view, name='register'),
     path('logout/', accounts_views.logout_view,   name='logout'),
-    path('dashboard/', accounts_views.dashboard_view, name='dashboard'),
 
     path('pasien/', accounts_views.pasien_index, name='pasien_index'),
     path('pasien/create', accounts_views.pasien_create, name='pasien_create'),
@@ -29,6 +30,9 @@ urlpatterns = [
     path('staff/create', accounts_views.staff_create, name='staff_create'),
     path('staff/<int:id>/edit', accounts_views.staff_edit, name='staff_edit'),
     path('staff/<int:id>/delete', accounts_views.staff_delete, name='staff_delete'),
+
+    # Dashboard Route
+    path('dashboard/', dashboard_views.dashboard_view, name='dashboard'),
 
     # Master Data Route
     path('metode-pembayaran/', master_data_views.metode_pembayaran_index, name="metode_pembayaran_index"),
@@ -56,4 +60,25 @@ urlpatterns = [
     path('kategori-obat/create', farmasi_views.kategori_obat_create, name="kategori_obat_create"),
     path('kategori-obat/<int:id>/edit', farmasi_views.kategori_obat_edit, name="kategori_obat_edit"),
     path('kategori-obat/<int:id>/delete', farmasi_views.kategori_obat_delete, name="kategori_obat_delete"),
+
+    # Adiministrasi Route
+    path('daftar-online/', administrasi_views.daftar_online_index, name="daftar_online_index"),
+    path('tiket/<str:no_tiket>', administrasi_views.cetak_tiket, name="cetak_tiket"),
+    
+    path('check-in/', administrasi_views.check_in_index, name="check_in_index"),
+    path('check-in/online', administrasi_views.check_in_online, name="check_in_online"),
+    path('check-in/offline', administrasi_views.check_in_offline, name="check_in_offline"),
+
+    path('loket/', administrasi_views.loket_index, name="loket_index"),
+    path('loket/create', administrasi_views.loket_create, name="loket_create"),
+    path('loket/<int:id>/edit', administrasi_views.loket_edit, name="loket_edit"),
+    path('loket/<int:id>/delete', administrasi_views.loket_delete, name="loket_delete"),
+
+    path('antrean/', administrasi_views.antrean_index, name="antrean_index"),
+    path('api/antrean/', administrasi_views.api_get_antrean, name="api_get_antrean"),
+    path('api/antrean/panggil/', administrasi_views.api_panggil_pasien, name="api_panggil_pasien"),
+    path('monitor/', administrasi_views.monitor_index, name="monitor_index"),
+
+    path('api/antrean/set_loket/', administrasi_views.api_set_loket, name='api_set_loket'),
+
 ]

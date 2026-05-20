@@ -174,37 +174,20 @@
     }
 }
 
-/* Custom Scrollbar untuk Navigasi */
-.custom-scrollbar::-webkit-scrollbar {
-    width: 5px; /* Membuat scrollbar jadi tipis */
-}
-
-/* Background jalur scrollbar disamakan dengan warna sidebar */
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: #0c2d48; 
-}
-
-/* Batang scrollbar (thumb) */
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1); /* Putih transparan agar halus */
-    border-radius: 10px;
-}
-
-/* Warna saat kursor menyentuh scrollbar */
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-/* Menghilangkan tombol panah (Buttons) */
-.custom-scrollbar::-webkit-scrollbar-button {
-    display: none;
-}
-
-/* Untuk Firefox (dukungan terbatas tapi fungsional) */
-.custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) #0c2d48;
-}
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px !important;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent !important;
+    border-radius: 10px !important;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 10px !important;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8!important;
+  }
 
 /* Container Utama Select2 */
 .select2-container--default .select2-selection--single {

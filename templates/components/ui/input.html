@@ -12,6 +12,7 @@
             type="{{ type|default:'text' }}" 
             placeholder="{{ placeholder }}" 
             name="{{ name }}"
+            id="input_{{ name }}"
             value="{{ value|default:'' }}"
             {% if required %}required{% endif %}
             {% if readonly %}readonly{% endif %}

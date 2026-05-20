@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from ..models import User
+from ..models import User, Pasien
 from django.urls import reverse
+from ..forms import PasienForm
 
 def welcome_view(request):
     return render(request, 'pages/welcome.html')
@@ -45,11 +46,20 @@ def register_view(request):
         password1   = request.POST.get('password1', '')
         password2   = request.POST.get('password2', '')
 
-        if not all([full_name, username, email, password1, password2]):
+        nik = request.POST.get("nik")
+        tanggal_lahir = request.POST.get('tanggal_lahir')
+        jenis_kelamin = request.POST.get('jenis_kelamin')
+        no_hp = request.POST.get('no_hp')
+        alamat = request.POST.get('alamat')
+
+        if not all([full_name, username, email, password1, password2, nik, tanggal_lahir, jenis_kelamin, no_hp, alamat]):
             messages.error(request, 'Semua field wajib diisi.')
 
         elif User.objects.filter(username=username).exists():
             messages.error(request, 'Username sudah digunakan, coba yang lain.')
+
+        elif Pasien.objects.filter(nik=nik).exists():
+            messages.error(request, 'Nik sudah digunakan, coba yang lain.')
 
         elif User.objects.filter(email=username).exists():
             messages.error(request, 'Email sudah digunakan, coba yang lain.')
@@ -72,37 +82,44 @@ def register_view(request):
             user.last_name  = last[0] if last else ''
             user.save()
 
+            Pasien.objects.create(
+                user = user,
+                nik = nik,
+                tanggal_lahir = tanggal_lahir,
+                jenis_kelamin = jenis_kelamin,
+                no_hp = no_hp,
+                alamat = alamat
+            )
+
             messages.success(request, f'Akun berhasil dibuat. Silakan masuk.')
             return redirect('login')
+        
+    jenis_kelamin_options = [
+        ('L', 'Laki-laki'),
+        ('P', 'Perempuan'),
+    ]
 
-    return render(request, 'pages/auth/register.html', {
+    form = PasienForm(request.POST or None)
+    context = {
         'left_features': [
             'Akses modul sesuai role pengguna',
             'Data tersimpan aman & terenkripsi',
             'Notifikasi real-time untuk staf',
             'Riwayat aktivitas tercatat otomatis',
-        ]
-    })
+        ],
+        'jenis_kelamin_options': jenis_kelamin_options,
+        'form' : form
+    }
+
+    return render(request, 'pages/auth/register.html', context)
 
 def logout_view(request):
     logout(request)
     messages.success(request, 'Anda berhasil keluar.')
     return redirect('login')
 
-@login_required
-def dashboard_view(request):
-    context = {
-        'breadcrumbs': [
-            {'name': 'Dashboard', 'url': reverse('dashboard')},
-        ],
-        'page_title': 'Dashboard'
-    }
-
-    return render(request, 'pages/dashboard/index.html', context)
-
-
 def generate_superadmin(request):
-    checkSuperadmin = User.objects.get(role="admin")
+    checkSuperadmin = User.objects.filter(role="admin")
 
     if checkSuperadmin:
         messages.error(request, "Akun superadmin sudah ada")
@@ -111,8 +128,9 @@ def generate_superadmin(request):
             full_name = "Administrator SIMK",
             username = "superadmin",
             email = "admin@gmail.com",
-            password = "rahasia123",
+            password = "password",
             role = "admin"
         )
         messages.success(request, "Akun superadmin berhasil dibuat")
     return redirect('login')
+

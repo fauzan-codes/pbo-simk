@@ -1,0 +1,90 @@
+{% extends 'layouts/app.html' %}
+{% block layout_content %}
+
+    <section class="w-full flex justify-center" >
+        <div class="bg-white p-8 w-[350px] shadow-lg border border-gray-200">
+            <div class="text-center mb-6">
+                <h1 class="text-xl font-bold uppercase tracking-wider">Klinik Utama</h1>
+                <p class="text-xs text-gray-500 mt-1">Jl. Contoh Alamat No. 123, Kota</p>
+                <p class="text-xs text-gray-500">Telp: (021) 1234567</p>
+            </div>
+    
+            <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
+    
+            <div class="text-center my-6">
+                <p class="text-sm font-semibold text-gray-600 uppercase tracking-widest mb-2">Nomor Antrean</p>
+                <h2 class="text-6xl font-extrabold text-black tracking-tighter">{{ tiket.kunjungan.kode_antrean }}</h2>
+                <p class="text-sm font-medium mt-3 bg-gray-100 py-1 px-3 inline-block rounded">
+                    Poli: {{ tiket.kunjungan.jadwal.poli.nama_poli|default:"-" }}
+                </p>
+            </div>
+    
+            <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
+    
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">No. Tiket:</span>
+                    <span class="font-bold">{{ tiket.no_tiket }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">No. RM:</span>
+                    <span class="font-bold">{{ tiket.pasien.nomor_rekam_medis }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Nama:</span>
+                    <span class="font-bold truncate max-w-[150px] text-right">
+                        {{ tiket.pasien.user.full_name|default:tiket.pasien.user.username }}
+                    </span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Tanggal:</span>
+                    <span class="font-bold">{{ tiket.kunjungan.tanggal_kunjungan|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+    
+            <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
+
+            <div class="flex flex-col items-center justify-center my-6">
+                <canvas id="qrcode" class="mb-2"></canvas>
+                <p class="text-[10px] text-gray-500 font-mono tracking-widest text-center">SCAN UNTUK CHECK-IN</p>
+            </div>
+
+        <div class="border-t-2 border-dashed border-gray-300 my-4"></div>
+    
+            <div class="text-center mt-6">
+                <p class="text-xs text-gray-600 font-medium">Harap tunggu sampai nomor Anda dipanggil.</p>
+                <p class="text-[10px] text-gray-400 mt-2">Dicetak pada: {% now "d/m/Y H:i" %}</p>
+            </div>
+    
+            <div class="mt-8 text-center no-print">
+                <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors text-sm shadow-sm">
+                    Cetak Ulang
+                </button>
+                <br>
+                <a href="{% url 'dashboard' %}" class="text-blue-500 hover:underline text-xs mt-3 inline-block">Kembali ke Dashboard</a>
+            </div>
+    
+        </div>
+    </section>
+
+    {% block extra_js %}  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var qr = new QRious({
+                element: document.getElementById('qrcode'),
+                value: '{{ tiket.no_tiket }}', 
+                size: 130,
+                level: 'H', 
+                padding: 0
+            });
+        });
+
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500); 
+        }
+    </script>
+    {% endblock %}
+{% endblock %} 

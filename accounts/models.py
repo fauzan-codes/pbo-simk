@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.conf import settings
+from datetime import datetime
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, full_name, username, email, password=None, **extra_fields):
@@ -33,13 +34,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False) 
 
     objects = CustomUserManager()
-
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email']
 
-    def __str__(self):
-        return self.username
-    
+    class Meta:
+        db_table = 'user'
+
 class Dokter(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='dokter_profile')
     spesialisasi = models.CharField(max_length=100)
@@ -48,6 +47,9 @@ class Dokter(models.Model):
     no_hp = models.CharField(max_length=5)
     alamat = models.TextField()
 
+    class Meta:
+        db_table = 'dokter'
+
 class Staff(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='staff_profile')
     jabatan = models.CharField(max_length=50)
@@ -55,12 +57,41 @@ class Staff(models.Model):
     no_hp = models.CharField(max_length=5)
     alamat = models.TextField()
 
+    class Meta:
+        db_table = 'staff'
+
 class Pasien(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='pasien_profile')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name='pasien_profile')
     nomor_rekam_medis = models.CharField(max_length=20, unique=True)
     nik = models.CharField(max_length=20, unique=True)
     tanggal_lahir = models.DateField()
     jenis_kelamin = models.CharField(max_length=10, choices=[('L', 'Laki-laki'), ('P', 'Perempuan')])
     alamat = models.TextField()
     no_hp = models.CharField(max_length=15)
+
+    class Meta:
+        db_table = 'pasien'
+
+    def save(self, *args, **kwargs):
+        if not self.nomor_rekam_medis:
+            self.nomor_rekam_medis = self.generate_nomor_rm()
+        
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def generate_nomor_rm(cls):
+        today_str = datetime.now().strftime('%Y%m%d')
+        prefix = f"RM-{today_str}-"
+        
+        last_pasien = cls.objects.filter(
+            nomor_rekam_medis__startswith=prefix
+        ).order_by('-nomor_rekam_medis').first()
+        
+        if last_pasien:
+            last_number = int(last_pasien.nomor_rekam_medis.split('-')[-1])
+            new_number = str(last_number + 1).zfill(3)
+        else:
+            new_number = "001"
+            
+        return f"{prefix}{new_number}"
 
