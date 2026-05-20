@@ -1,1 +1,1 @@
-from .kategori_obat_view import *
+from .kategori_obat_view import * 

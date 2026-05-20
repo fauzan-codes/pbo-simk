@@ -1,27 +1,44 @@
 {% extends 'layouts/auth.html' %}
-{% block title %}Daftar - SIMK{% endblock %}
+{% block title %}Daftar Pasien Baru - SIMK{% endblock %}
 
-{% block left_title %}Bergabung bersama<br><span class="font-semibold">tim klinik Anda</span>{% endblock %}
-{% block left_desc %}Buat akun untuk mulai mengakses sistem manajemen klinik terintegrasi.{% endblock %}
+{% block left_title %}Layanan Kesehatan<br><span class="font-semibold">Terbaik untuk Anda</span>{% endblock %}
+{% block left_desc %}Buat akun untuk mendaftar sebagai pasien dan nikmati kemudahan layanan kesehatan terintegrasi kami.{% endblock %}
 
 {% block auth_content %}
-<div class="mb-8">
-  <h2 class="text-2xl font-semibold text-slate-900 tracking-tight">Buat akun baru</h2>
-  <p class="text-slate-500 text-sm mt-1">Lengkapi data berikut untuk mendaftar</p>
+<div class="mb-6">
+  <h2 class="text-2xl font-semibold text-slate-900 tracking-tight">Pendaftaran Pasien Baru</h2>
+  <p class="text-slate-500 text-sm mt-1">Silakan lengkapi formulir di bawah ini.</p>
 </div>
 
-<form method="POST">
+<form method="POST" class="flex flex-col">
   {% csrf_token %}
-  {% include "components/ui/input.html" with label="Nama Lsengkap" name="full_name" type="text" placeholder="Masukkan nama lengkap" required=True %}
-  {% include "components/ui/input.html" with label="Username" name="username" type="text" placeholder="Masukkan username" required=True %}
-  {% include "components/ui/input.html" with label="Email" name="email" type="email" placeholder="Masukkan email" required=True %}
-  {% include "components/ui/input.html" with label="Password" name="password1" type="password" placeholder="Masukkan password" required=True %}
-  {% include "components/ui/input.html" with label="Konfirmasi Password" name="password2" type="password" placeholder="Ulangi password" required=True %}
 
-  {% include "components/ui/button.html" with label="Buat Akun" type="submit" variant="primary" class="w-full justify-center" %}
+  <div class="space-y-4 max-h-[420px] overflow-y-auto pr-4 custom-scrollbar mb-6">
+    
+    <div>
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 mb-4">Informasi Akun</h3>
+      {% include "components/ui/input.html" with label="Nama Lengkap" name="full_name" type="text" placeholder="Sesuai KTP" required=True value=form.full_name.value|default:'' %}
+      {% include "components/ui/input.html" with label="Username" name="username" type="text" placeholder="Masukkan username" required=True value=form.username.value|default:'' %}
+      {% include "components/ui/input.html" with label="Email" name="email" type="email" placeholder="email@contoh.com" required=True value=form.email.value|default:'' %}
+      {% include "components/ui/input.html" with label="Nomor HP / WhatsApp" name="no_hp" type="tel" placeholder="08xxxxxxxxxx" required=True value=form.no_hp.value|default:'' %}
+      {% include "components/ui/input.html" with label="Password" name="password1" type="password" placeholder="Minimal 8 karakter" required=True %}
+      {% include "components/ui/input.html" with label="Konfirmasi Password" name="password2" type="password" placeholder="Ulangi password" required=True %}
+    </div>
+
+    <div class="pt-2">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2 mb-4">Data Diri Pasien</h3>
+      {% include "components/ui/input.html" with label="NIK (Sesuai KTP)" name="nik" type="text" placeholder="16 Digit NIK" required=True value=form.nik.value|default:'' %}
+      {% include "components/ui/input.html" with label="Tanggal Lahir" name="tanggal_lahir" type="date" required=True value=form.tanggal_lahir.value|default:'' %}
+      {% include "components/ui/select.html" with label="Jenis Kelamin" name="jenis_kelamin" options=jenis_kelamin_options placeholder="Pilih Jenis Kelamin" required=True selected_value=form.jenis_kelamin.value|default:'' %}
+      {% include "components/ui/textarea.html" with label="Alamat Lengkap" name="alamat" rows=3 placeholder="Jalan, RT/RW, Kelurahan, Kecamatan" required=True value=form.alamat.value|default:'' %}
+    </div>
+  </div>
+
+  {% include "components/ui/button.html" with label="Daftar Sekarang" type="submit" variant="primary" class="w-full justify-center py-2.5 shadow-lg shadow-sky-100" %}
 </form>
 
-<p class="text-center text-xs text-slate-500 mt-6">
-  Sudah punya akun? <a href="{% url 'login' %}" class="text-sky-500 font-medium hover:underline">Masuk di sini</a>
+<p class="text-center text-sm text-slate-500 mt-6">
+  Sudah terdaftar sebagai pasien? <a href="{% url 'login' %}" class="text-sky-600 font-semibold hover:underline">Masuk di sini</a>
 </p>
+
 {% endblock %}

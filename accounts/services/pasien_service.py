@@ -1,29 +1,10 @@
 from django.db import transaction
-from datetime import datetime
 from ..models import User, Pasien
 
 class PasienService:
     @staticmethod
-    def generate_nomor_rm():
-        today_str = datetime.now().strftime('%Y%m%d')
-        prefix = f"RM-{today_str}-"
-        
-        last_pasien = Pasien.objects.filter(
-            nomor_rekam_medis__startswith=prefix
-        ).order_by('-nomor_rekam_medis').first()
-        
-        if last_pasien:
-            last_number = int(last_pasien.nomor_rekam_medis.split('-')[-1])
-            new_number = str(last_number + 1).zfill(3)
-        else:
-            new_number = "001"
-            
-        return f"{prefix}{new_number}"
-
-    @staticmethod
     @transaction.atomic
     def create_pasien(user_data, pasien_data):
-        nomor_rm = PasienService.generate_nomor_rm()
         
         user = User.objects.create_user(
             username=user_data['username'],
@@ -35,7 +16,6 @@ class PasienService:
         
         pasien = Pasien.objects.create(
             user=user,
-            nomor_rekam_medis=nomor_rm,
             **pasien_data
         )
         
