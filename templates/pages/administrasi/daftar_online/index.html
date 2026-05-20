@@ -1,0 +1,122 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+<div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
+    <h3 class="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-sky-500 rounded-full"></span>
+            Detail Kunjungan
+        </h3>
+    <form method="POST" class="flex flex-col">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-6 gap-x-6">
+            <div class="md:col-span-3 col-span-6">
+                {% include 'components/ui/input.html' with label="Tanggal Kunjungan" name="tanggal_kunjungan" type="date" required=True value=form.tanggal_kunjungan|date:"Y-m-d" %}
+            </div>
+
+            <div class="md:col-span-3 col-span-6">
+                {% include 'components/ui/select.html' with label="Jadwal Dokter" name="jadwal_id" placeholder="-- Pilih Tanggal Kunjungan Dulu --" required=True %}
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-6 mt-2 border-t border-slate-100">
+            {% include 'components/ui/button.html' with label="Batal" variant="ghost" onClick="window.history.back()" %}
+            {% include 'components/ui/button.html' with label="Daftar" type="submit" variant="primary" %}
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %} 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputTanggal = document.getElementById('input_tanggal_kunjungan');
+    const selectJadwal = document.querySelector('select[name="jadwal_id"]'); 
+    
+    const jadwalDataRaw = '{{ jadwal_data_json|escapejs }}';
+    const jadwalData = jadwalDataRaw ? JSON.parse(jadwalDataRaw) : {};
+    
+    const namaHariDict = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+
+    if (inputTanggal) {
+        const today = new Date();
+        
+        const formatDate = (dateObj) => {
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        const minDateStr = formatDate(today);
+        
+        let maxDateObj = new Date(today);
+        let daysAdded = 0;
+        
+        while (daysAdded < 3) {
+            maxDateObj.setDate(maxDateObj.getDate() + 1);
+            if (maxDateObj.getDay() !== 0 && maxDateObj.getDay() !== 6) {
+                daysAdded++;
+            }
+        }
+        const maxDateStr = formatDate(maxDateObj);
+
+        inputTanggal.setAttribute('min', minDateStr);
+        inputTanggal.setAttribute('max', maxDateStr);
+
+        if (!inputTanggal.value) {
+            let defaultDate = new Date(today);
+            if (defaultDate.getDay() === 6) {
+                defaultDate.setDate(defaultDate.getDate() + 2);
+            } else if (defaultDate.getDay() === 0) {
+                defaultDate.setDate(defaultDate.getDate() + 1);
+            }
+            inputTanggal.value = formatDate(defaultDate);
+        }
+
+        if (selectJadwal) {
+            inputTanggal.addEventListener('change', function() {
+                const dateVal = this.value;
+                
+                selectJadwal.innerHTML = '<option value="" disabled selected>-- Pilih Jadwal Dokter --</option>';
+                
+                if (dateVal) {
+                    const dateObj = new Date(dateVal);
+                    const hariIndex = dateObj.getDay();
+                    
+                    if (hariIndex === 0 || hariIndex === 6) {
+                        selectJadwal.innerHTML = '<option value="" disabled selected>-- Klinik tutup di akhir pekan --</option>';
+                        return;
+                    }
+
+                    const hariString = namaHariDict[hariIndex];
+                    const jadwalTersedia = jadwalData[hariString] || [];
+                    
+                    if (jadwalTersedia.length > 0) {
+                        jadwalTersedia.forEach(jadwal => {
+                            const opt = document.createElement('option');
+                            opt.value = jadwal.value;
+                            opt.textContent = jadwal.label;
+                            selectJadwal.appendChild(opt);
+                        });
+                    } else {
+                        selectJadwal.innerHTML = '<option value="" disabled selected>-- Tidak ada jadwal praktik di hari ini --</option>';
+                    }
+                }
+            });
+
+            if (inputTanggal.value) {
+                inputTanggal.dispatchEvent(new Event('change'));
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

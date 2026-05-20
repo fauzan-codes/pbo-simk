@@ -1,0 +1,314 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+<!-- PANEL KONTROL LOKET TUGAS -->
+<div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-lg font-bold text-slate-800">Loket Tugas Anda</h2>
+            <p class="text-sm text-slate-500">Pilih loket tempat Anda bertugas saat ini untuk mulai memanggil pasien.</p>
+        </div>
+        
+        <div id="loketControlPanel" class="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-100">
+            <!-- Konten ini akan dirender oleh JavaScript berdasarkan status -->
+            <div class="text-sm text-slate-400 px-4 py-2">Memuat status loket...</div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+    <div class="xl:col-span-3">
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-bold text-slate-800">Daftar Antrian Menunggu</h2>
+                <span id="connectionStatus" class="inline-flex items-center gap-2 text-sm font-medium">
+                    <span class="inline-block w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span class="text-red-600">Tidak Terkoneksi</span>
+                </span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table id="antreanTable" class="w-full text-sm text-left">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-100">
+                            <th class="pb-4 font-semibold uppercase tracking-wider">Kode Antrian</th>
+                            <th class="pb-4 font-semibold uppercase tracking-wider">Pasien</th>
+                            <th class="pb-4 font-semibold uppercase tracking-wider">Poli</th>
+                            <th class="pb-4 font-semibold uppercase tracking-wider text-center">Tanggal</th>
+                            <th class="pb-4 font-semibold uppercase tracking-wider text-center">No Urut</th>
+                            <th class="pb-4 font-semibold uppercase tracking-wider text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50" id="antreanList">
+                        <tr>
+                            <td colspan="6" class="py-12 text-center text-slate-400 italic">
+                                Memuat data antrian...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="xl:col-span-1">
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+            <h2 class="text-lg font-bold text-slate-800 mb-6">Status Loket Global</h2>
+            <div class="space-y-4" id="loketList">
+                <div class="bg-slate-50 rounded-xl p-4 text-center text-slate-400 text-sm">
+                    Memuat data loket...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script>
+    // State Global
+    let activeLoketId = '{{ request.session.active_loket_id|default:"" }}'; 
+    let activeLoketName = '';
+
+    function updateConnectionStatus(status) {
+        const statusEl = document.getElementById('connectionStatus');
+        if (status === 'error' || status === 'offline') {
+            statusEl.innerHTML = '<span class="inline-block w-2 h-2 bg-red-500 rounded-full"></span><span class="text-red-600">Koneksi Terputus</span>';
+        } else if (status === 'connected') {
+            statusEl.innerHTML = '<span class="inline-block w-2 h-2 bg-green-500 rounded-full animate-pulse"></span><span class="text-green-600">Terhubung (Live)</span>';
+        } else if (status === 'connecting') {
+            statusEl.innerHTML = '<span class="inline-block w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span><span class="text-yellow-600">Menghubungkan...</span>';
+        }
+    }
+
+    function initMQTT() {
+        updateConnectionStatus('connecting');
+        const brokerUrl = '{{ mqtt_url }}'; 
+        const clientId = 'simk_staff_' + Math.random().toString(16).substr(2, 8);
+        
+        const client = mqtt.connect(brokerUrl, {
+            clientId: clientId,
+            clean: true,
+            connectTimeout: 4000,
+            reconnectPeriod: 5000,
+        });
+
+        client.on('connect', function () {
+            updateConnectionStatus('connected');
+            client.subscribe('simk/antrean/refresh');
+        });
+
+        client.on('message', function (topic, message) {
+            if (topic === 'simk/antrean/refresh') {
+                fetchAntrean(true);
+            }
+        });
+
+        client.on('offline', () => updateConnectionStatus('offline'));
+        client.on('error', () => updateConnectionStatus('error'));
+    }
+
+    function fetchAntrean(isSilent = false) {
+        fetch('/api/antrean/')
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                window.loketList = data.loket;
+                
+                // Cari nama loket jika staff sudah punya activeLoketId
+                if (activeLoketId) {
+                    const foundLoket = data.loket.find(l => l.id == activeLoketId);
+                    if (foundLoket) activeLoketName = foundLoket.nama_loket;
+                }
+
+                renderLoketControl();
+                updateAntreanList(data.antrean);
+                updateLoketList(data.loket);
+            })
+            .catch(error => {
+                if (!isSilent) console.error('Error fetching data:', error);
+            });
+    }
+
+    // --- FUNGSI BARU: RENDER PANEL KONTROL LOKET ---
+    function renderLoketControl() {
+        const panel = document.getElementById('loketControlPanel');
+        
+        if (activeLoketId) {
+            // STATE: SUDAH PILIH LOKET
+            panel.innerHTML = `
+                <div class="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold text-sm border border-green-200">
+                    <span class="font-normal text-green-600 mr-1">Bertugas di:</span> ${activeLoketName}
+                </div>
+                <button onclick="releaseLoket()" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-lg text-sm font-semibold transition-colors">
+                    Selesai Tugas
+                </button>
+            `;
+        } else {
+            // STATE: BELUM PILIH LOKET
+            const options = window.loketList ? window.loketList.map(l => `<option value="${l.id}">${l.nama_loket}</option>`).join('') : '';
+            panel.innerHTML = `
+                <select id="selectLoketTugas" class="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white min-w-[150px]">
+                    <option value="">-- Pilih Loket --</option>
+                    ${options}
+                </select>
+                <button onclick="saveLoket()" class="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors text-sm font-semibold shadow-sm">
+                    Mulai Tugas
+                </button>
+            `;
+        }
+    }
+
+    // --- FUNGSI BARU: SIMPAN & LEPASKAN LOKET ---
+    function saveLoket() {
+        const select = document.getElementById('selectLoketTugas');
+        const loketId = select.value;
+        if (!loketId) return alert('Silakan pilih loket terlebih dahulu!');
+
+        // Panggil API untuk update tabel Loket (isi staff_id)
+        fetch('/api/antrean/set_loket/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ loket_id: loketId, action: 'start' })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                activeLoketId = loketId;
+                fetchAntrean(); // Refresh UI & Trigger MQTT dari backend
+            } else {
+                alert('Gagal: ' + data.message);
+            }
+        });
+    }
+
+    function releaseLoket() {
+        if (!confirm('Akhiri tugas di loket ini?')) return;
+
+        // Panggil API untuk update tabel Loket (kosongkan staff_id)
+        fetch('/api/antrean/set_loket/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ loket_id: activeLoketId, action: 'stop' })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                activeLoketId = '';
+                activeLoketName = '';
+                fetchAntrean();
+            }
+        });
+    }
+
+    function callPatient(kunjunganId) {
+        // Validasi utama: Apakah staff sudah memilih loket?
+        if (!activeLoketId) {
+            alert('Anda harus Memilih dan Memulai Tugas di sebuah loket terlebih dahulu!');
+            return;
+        }
+
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Memanggil...';
+        btn.disabled = true;
+
+        fetch('/api/antrean/panggil/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                kunjungan_id: kunjunganId,
+                loket_id: activeLoketId // Gunakan loket aktif, bukan dari row
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') fetchAntrean(); 
+            else alert('Error: ' + data.message);
+        })
+        .finally(() => {
+            btn.textContent = originalText;
+            btn.disabled = false;
+        });
+    }
+
+    function updateAntreanList(antrean) {
+        const list = document.getElementById('antreanList');
+        if (antrean.length === 0) {
+            list.innerHTML = '<tr><td colspan="6" class="py-12 text-center text-slate-400 italic">Tidak ada pasien yang menunggu</td></tr>';
+            return;
+        }
+
+        list.innerHTML = antrean.map(item => {
+            // Disable tombol panggil jika staff belum pilih loket
+            const btnClass = activeLoketId 
+                ? "bg-sky-500 hover:bg-sky-600 text-white" 
+                : "bg-slate-200 text-slate-400 cursor-not-allowed";
+            const disabledAttr = activeLoketId ? "" : "disabled title='Pilih loket terlebih dahulu'";
+
+            return `
+            <tr class="hover:bg-slate-50 transition-colors border-b border-slate-50">
+                <td class="py-4"><p class="font-bold text-lg text-slate-900">${item.kode_antrean}</p></td>
+                <td class="py-4"><p class="font-semibold text-slate-700">${item.pasien}</p></td>
+                <td class="py-4"><p class="font-semibold text-slate-700">${item.poli}</p></td>
+                <td class="py-4 text-center"><p class="font-semibold text-slate-700">${item.tanggal}</p></td>
+                <td class="py-4 text-center">
+                    <span class="inline-flex items-center justify-center w-8 h-8 bg-sky-100 text-sky-600 rounded-lg font-bold">
+                        ${item.nomor_antrean}
+                    </span>
+                </td>
+                <td class="py-4 text-center">
+                    <button onclick="callPatient(${item.id})" class="px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${btnClass}" ${disabledAttr}>
+                        Panggil
+                    </button>
+                </td>
+            </tr>
+        `}).join('');
+    }
+
+    function updateLoketList(lokets) {
+        const list = document.getElementById('loketList');
+        if (lokets.length === 0) return list.innerHTML = '<div class="bg-slate-50 rounded-xl p-4 text-center text-slate-400 text-sm">Tidak ada loket</div>';
+
+        list.innerHTML = lokets.map(loket => {
+            const isAktif = loket.staff !== '-';
+            const hasKunjungan = loket.kunjungan_id !== null;
+            
+            const bgColor = isAktif ? (hasKunjungan ? 'bg-sky-50' : 'bg-white') : 'bg-slate-50';
+            const borderColor = isAktif ? (hasKunjungan ? 'border-sky-200' : 'border-slate-200') : 'border-slate-100';
+            const statusColor = hasKunjungan ? 'text-sky-600' : 'text-slate-400';
+
+            return `
+                <div class="border ${borderColor} rounded-xl p-4 ${bgColor} relative overflow-hidden">
+                    ${!isAktif ? '<div class="absolute top-0 left-0 w-1 h-full bg-slate-300"></div>' : '<div class="absolute top-0 left-0 w-1 h-full bg-green-500"></div>'}
+                    <p class="font-bold text-slate-800 mb-1 ml-2">${loket.nama_loket}</p>
+                    <p class="text-xs ${isAktif ? 'text-green-600 font-semibold' : 'text-slate-400'} mb-3 ml-2">
+                        Staff: ${loket.staff}
+                    </p>
+                    <div class="bg-white rounded-lg p-3 text-center shadow-sm border border-slate-100">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Dipanggil:</p>
+                        <p class="font-bold text-lg ${statusColor}">
+                            ${isAktif ? loket.pasien_dipanggil : 'OFFLINE'}
+                        </p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchAntrean(); 
+        initMQTT();    
+    });
+</script>
+{% endblock %}

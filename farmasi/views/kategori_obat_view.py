@@ -8,7 +8,7 @@ from django.urls import reverse
 def kategori_obat_index(request):
     kategori_list = KategoriObat.objects.all()
     context = {
-        'kategori_list': kategori_list,
+        'kategori_list': kategori_list, 
         'breadcrumbs': [
             {'name': 'Kategori Obat', 'url': reverse('kategori_obat_index')},
         ],

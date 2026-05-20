@@ -1,0 +1,33 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+<div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-sm font-bold text-slate-800 mb-6 flex items-center gap-2">
+            <span class="w-1.5 h-6 bg-sky-500 rounded-full"></span>
+            Informasi Loket
+        </h3>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="grid md:grid-cols-2 gap-x-6 w-full">
+                <div>
+                    {% include 'components/ui/input.html' with label="Nama Loket" name="nama_loket" value=loket.nama_loket required=True  %}
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-slate-50">
+                <a href="{% url 'loket_index' %}" class="px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                    Batal
+                </a>
+                {% include 'components/ui/button.html' with variant='primary' type="submit" label='Simpan Perubahan' %}
+            </div>
+        </form>
+</div>
+{% endblock %}
