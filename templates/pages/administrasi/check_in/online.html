@@ -1,0 +1,166 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+<div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
+    
+    <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8 flex flex-col">
+        <div class="flex items-center gap-3 mb-6">
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">Scan QR Code</h3>
+                <p class="text-sm text-slate-500">Arahkan QR Code dari aplikasi ke area kotak di bawah.</p>
+            </div>
+        </div>
+
+        <div class="grow flex flex-col items-center justify-center bg-black border-2 border-dashed border-slate-300 rounded-2xl p-6 min-h-[350px] relative overflow-hidden">
+            <div id="qr-reader" class="w-full h-full absolute inset-0 z-0 overflow-hidden"></div>
+            
+            <div id="qr-overlay" class="absolute inset-0 flex flex-col items-center justify-center z-10 transition-opacity duration-300 pointer-events-none">
+                <div class="w-40 h-40 md:w-56 md:h-56 mx-auto mb-4 border-4 border-sky-200/50 rounded-2xl relative bg-white/10">
+                    <div class="absolute inset-0 border-t-4 border-l-4 border-sky-500 rounded-tl-xl w-6 h-6 -top-1 -left-1"></div>
+                    <div class="absolute inset-0 border-t-4 border-r-4 border-sky-500 rounded-tr-xl w-6 h-6 -top-1 -right-1 left-auto"></div>
+                    <div class="absolute inset-0 border-b-4 border-l-4 border-sky-500 rounded-bl-xl w-6 h-6 -bottom-1 -left-1 top-auto"></div>
+                    <div class="absolute inset-0 border-b-4 border-r-4 border-sky-500 rounded-br-xl w-6 h-6 -bottom-1 -right-1 top-auto left-auto"></div>
+                </div>
+                <p id="qr-status" class="text-slate-800 bg-white/80 px-4 py-1.5 rounded-full font-bold text-sm inline-block shadow-sm">Meminta akses kamera...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="lg:col-span-5 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div>
+                <h3 class="text-lg font-bold text-slate-800">Input Manual</h3>
+                <p class="text-sm text-slate-500">Gunakan jika tidak bisa scan QR.</p>
+            </div>
+        </div>
+
+        <form id="form-manual" method="POST" action="" class="space-y-5">
+            {% csrf_token %}
+            
+            {% include 'components/ui/input.html' with name="no_tiket" label="Nomor Tiket / Kode Booking" placeholder="Contoh: SIMK-8924-XYZ" required=True class="uppercase font-medium" %}
+
+            {% include 'components/ui/button.html' with type="submit" variant="primary" label="Proses Check-in" class="w-full" %}
+        </form>
+    </div>
+</div>
+
+<div id="checkin-modal" class="fixed inset-0 z-50 {% if not show_modal %}hidden{% endif %}">
+    <div class="absolute inset-0 bg-slate-900/40 transition-opacity" onclick="closeModal()"></div>
+    
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+        <div class="relative bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-lg w-full p-6 lg:p-8">
+            
+            <div class="mb-6 text-center">
+                <div class="w-14 h-14 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-slate-800">Check-in Berhasil</h3>
+                <p class="text-sm text-slate-500">Status kunjungan telah diubah ke "Menunggu".</p>
+            </div>
+            
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6 space-y-4">
+                <div class="flex justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Nomor Tiket</p>
+                        <p class="text-md font-semibold text-slate-700">{{ no_tiket }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 text-end">Tanggal Kunjungan</p>
+                        <p class="text-md font-semibold text-slate-700 text-end">{{ kunjungan.tanggal_kunjungan|default:"-" }}</p>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Nama Pasien</p>
+                        <p class="text-md font-semibold text-slate-700">{{ kunjungan.pasien.user.full_name|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 text-end">Nomor Antrean</p>
+                        <p class="text-md font-semibold text-slate-700 text-end">{{ kunjungan.kode_antrean|default:"-" }}</p>
+                    </div>
+                </div>
+                <div class="flex justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Poli</p>
+                        <p class="text-md font-semibold text-slate-700">{{ kunjungan.jadwal.poli.nama_poli|default:"-" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 text-end">Dokter</p>
+                        <p class="text-md font-semibold text-slate-700 text-end">{{ kunjungan.jadwal.dokter.user.full_name|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                {% include 'components/ui/button.html' with type="button" variant="primary" label="Selesai & Tutup" class="w-full" onClick="closeModal()" %}
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %} 
+<style>
+    #qr-reader video {
+        object-fit: cover !important;
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %} 
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<script>
+    function closeModal() {
+        document.getElementById('checkin-modal').classList.add('hidden');
+        window.location.href = "{% url 'check_in_online' %}";
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        {% if show_modal %}
+            return;
+        {% endif %}
+
+        const html5QrCode = new Html5Qrcode("qr-reader");
+        const statusText = document.getElementById('qr-status');
+        const inputNoTiket = document.getElementById('input_no_tiket');
+
+        const onScanSuccess = (decodedText, decodedResult) => {
+            html5QrCode.stop().then(() => {
+                statusText.textContent = "Memproses...";
+                statusText.classList.replace('text-slate-800', 'text-green-600');
+                
+                if (inputNoTiket) {
+                    inputNoTiket.value = decodedText;
+                }
+                
+                document.getElementById('form-manual').submit();
+            });
+        };
+
+        html5QrCode.start(
+            { facingMode: "environment" }, 
+            { fps: 10 },
+            onScanSuccess
+        )
+        .then(() => {
+            statusText.textContent = "Arahkan QR ke area kotak";
+        })
+        .catch((err) => {
+            statusText.textContent = "Akses kamera ditolak / tidak ditemukan";
+            statusText.classList.replace('text-slate-800', 'text-red-600');
+            console.error("Error starting camera: ", err);
+        });
+    });
+</script>
+{% endblock %}

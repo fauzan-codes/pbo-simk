@@ -1,0 +1,198 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}Layar Antrean Pasien{% endblock %}
+
+{% block dashboard_content %}
+<div class="flex flex-col gap-6">
+    
+    <div class="flex justify-between items-center bg-white rounded-full border border-slate-200 px-6 py-3 shadow-sm">
+        <h1 class="text-lg font-bold text-slate-800 tracking-wide uppercase">Layar Antrean Poliklinik</h1>
+        <span id="connectionStatus" class="inline-flex items-center gap-2 text-sm font-semibold">
+            <span class="inline-block w-2.5 h-2.5 bg-yellow-500 rounded-full animate-pulse"></span>
+            <span class="text-yellow-600">Menghubungkan ke Server...</span>
+        </span>
+    </div>
+
+    <div class="bg-linear-to-br from-blue-600 to-sky-500 rounded-3xl shadow-lg overflow-hidden relative border border-blue-400">
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
+        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-blue-300 opacity-20 rounded-full blur-2xl"></div>
+        
+        <div class="p-10 md:p-16 flex flex-col items-center justify-center text-center relative z-10 text-white">
+            <p class="text-lg md:text-xl font-bold uppercase tracking-[0.2em] text-blue-100 mb-4" id="mainSubtitle">
+                MENUNGGU PANGGILAN
+            </p>
+            <h2 class="text-7xl md:text-[120px] font-extrabold tracking-tighter mb-6 drop-shadow-md leading-none" id="mainQueueNumber">
+                ---
+            </h2>
+            <div class="inline-flex items-center justify-center px-8 py-3 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 text-2xl md:text-4xl font-bold shadow-inner" id="mainLoketName">
+                TIDAK ADA AKTIVITAS
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <h3 class="font-semibold text-slate-800 mb-4 text-lg flex items-center gap-2">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            Status Loket Pelayanan
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5" id="loketGrid">
+            <div class="col-span-full bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-400">
+                Memuat data loket...
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script>
+    const bellSound = new Audio('https://actions.google.com/sounds/v1/alarms/doorbell.ogg'); 
+    
+    function updateConnectionStatus(status) {
+        const statusEl = document.getElementById('connectionStatus');
+        if (status === 'error' || status === 'offline') {
+            statusEl.innerHTML = '<span class="inline-block w-2.5 h-2.5 bg-red-500 rounded-full"></span><span class="text-red-600">Terputus</span>';
+        } else if (status === 'connected') {
+            statusEl.innerHTML = '<span class="inline-block w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span><span class="text-green-600">Terhubung (Live)</span>';
+        }
+    }
+
+    function initMQTT() {
+        const brokerUrl = '{{ mqtt_url }}'; 
+        const clientId = 'simk_tv_' + Math.random().toString(16).substr(2, 8);
+        
+        const client = mqtt.connect(brokerUrl, {
+            clientId: clientId,
+            clean: true,
+            connectTimeout: 4000,
+            reconnectPeriod: 5000,
+        });
+
+        client.on('connect', function () {
+            updateConnectionStatus('connected');
+            client.subscribe('simk/antrean/refresh');
+        });
+
+        client.on('message', function (topic, message) {
+            if (topic === 'simk/antrean/refresh') {
+                try {
+                    const payload = JSON.parse(message.toString());
+                    fetchAndRenderDisplay(payload.loket_id);
+                } catch (e) {
+                    fetchAndRenderDisplay();
+                }
+            }
+        });
+
+        client.on('offline', () => updateConnectionStatus('offline'));
+        client.on('error', () => updateConnectionStatus('error'));
+    }
+
+    function fetchAndRenderDisplay(lastCalledLoketId = null) {
+        fetch('/api/antrean/')
+            .then(res => res.json())
+            .then(data => {
+                renderLoketGrid(data.loket);
+                
+                if (lastCalledLoketId) {
+                    const loketDipanggil = data.loket.find(l => l.id == lastCalledLoketId);
+                    if (loketDipanggil && loketDipanggil.pasien_dipanggil !== '-') {
+                        updateMainBox(loketDipanggil);
+                        panggilSuara(loketDipanggil.pasien_dipanggil, loketDipanggil.nama_loket);
+                    }
+                }
+            })
+            .catch(err => console.error('Error fetching data:', err));
+    }
+
+    function updateMainBox(loket) {
+        document.getElementById('mainSubtitle').innerText = "NOMOR ANTREAN";
+        
+        const queueNumberEl = document.getElementById('mainQueueNumber');
+        queueNumberEl.innerText = loket.pasien_dipanggil;
+        
+        void queueNumberEl.offsetWidth; 
+
+        document.getElementById('mainLoketName').innerText = `MENUJU ${loket.nama_loket.toUpperCase()}`;
+    }
+
+    function renderLoketGrid(lokets) {
+        const grid = document.getElementById('loketGrid');
+        
+        if (!lokets || lokets.length === 0) {
+            grid.innerHTML = '<div class="col-span-full bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">Belum ada data loket.</div>';
+            return;
+        }
+
+        grid.innerHTML = lokets.map(loket => {
+            const isAktif = loket.staff !== '-';
+            const isKosong = loket.pasien_dipanggil === '-';
+            
+            let bgClass = "bg-slate-50";
+            let borderClass = "border-slate-200";
+            let statusBadge = "";
+            let textNumberClass = "text-slate-300";
+            let numberDisplay = "---";
+
+            if (!isAktif) {
+                statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-500 uppercase">Nonaktif</span>';
+                numberDisplay = "OFFLINE";
+                textNumberClass = "text-slate-400 text-3xl";
+            } else if (isKosong) {
+                bgClass = "bg-white";
+                statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700 uppercase">Aktif (Kosong)</span>';
+                numberDisplay = "KOSONG";
+                textNumberClass = "text-slate-300 text-3xl";
+            } else {
+                bgClass = "bg-white";
+                borderClass = "border-blue-200 shadow-md ring-1 ring-blue-50";
+                statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 uppercase">${loket.staff}</span>`;
+                numberDisplay = loket.pasien_dipanggil;
+                textNumberClass = "text-blue-600 text-5xl";
+            }
+
+            return `
+                <div class="${bgClass} border ${borderClass} rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all h-48 relative overflow-hidden group">
+                    <!-- Strip warna di atas box -->
+                    <div class="absolute top-0 left-0 right-0 h-1.5 ${isAktif && !isKosong ? 'bg-blue-500' : (isAktif ? 'bg-green-400' : 'bg-slate-300')}"></div>
+                    
+                    <div class="flex items-center justify-between w-full mb-4">
+                        <h4 class="font-bold text-slate-700 text-lg">${loket.nama_loket}</h4>
+                        ${statusBadge}
+                    </div>
+                    
+                    <div class="flex-1 flex items-center justify-center w-full">
+                        <h5 class="font-black ${textNumberClass} tracking-tight">
+                            ${numberDisplay}
+                        </h5>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function panggilSuara(nomorAntrean, namaLoket) {
+        bellSound.play().catch(e => console.log("Audio autoplay blocked by browser"));
+
+        setTimeout(() => {
+            let ejaanNomor = nomorAntrean.split('').join(' '); 
+            let teks = `Nomor Antrean, ${ejaanNomor}, silakan menuju, ${namaLoket}`;
+            
+            let speech = new SpeechSynthesisUtterance(teks);
+            speech.lang = 'id-ID';
+            speech.rate = 0.85;
+            speech.pitch = 1;
+
+            window.speechSynthesis.speak(speech);
+        }, 1500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchAndRenderDisplay();
+        initMQTT();
+    });
+</script>
+{% endblock %}

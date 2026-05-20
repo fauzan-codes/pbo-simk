@@ -10,11 +10,17 @@ class Obat(models.Model):
     stok = models.PositiveIntegerField()
     harga_jual = models.DecimalField(max_digits=12, decimal_places=2)
 
+    class Meta:
+        db_table = 'obat'
+
 class Resep(models.Model):
     rekam_medis = models.ForeignKey('pelayanan.RekamMedis', on_delete=models.CASCADE)
     apoteker = models.ForeignKey('accounts.Staff', on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=20, default='diproses')
     tanggal_resep = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'resep'
 
 class DetailResep(models.Model):
     resep = models.ForeignKey(Resep, on_delete=models.CASCADE)
@@ -22,3 +28,6 @@ class DetailResep(models.Model):
     jumlah_diminta = models.PositiveIntegerField()
     dosis_aturan = models.CharField(max_length=100)
     subtotal_harga = models.DecimalField(max_digits=12, decimal_places=2)
+
+    class Meta:
+        db_table = 'detail_resep'

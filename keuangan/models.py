@@ -10,3 +10,6 @@ class Tagihan(models.Model):
     metode_bayar = models.ForeignKey('master_data.MetodePembayaran', on_delete=models.SET_NULL, null=True)
     status_pembayaran = models.CharField(max_length=20, default='belum_lunas')
     waktu_pembayaran = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'tagihan'
