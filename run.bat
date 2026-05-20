@@ -7,3 +7,5 @@ start /B python manage.py tailwind start
 
 echo Menjalankan Django Server...
 python manage.py runserver
+
+pause
