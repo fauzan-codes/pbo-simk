@@ -1,0 +1,221 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">
+        {{ page_title }}
+    </h1>
+
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+
+    <!-- DATA OBAT -->
+    <div class="xl:col-span-8">
+
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+
+            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">
+                        Daftar Obat
+                    </h3>
+
+                    <p class="text-sm text-slate-400 mt-1">
+                        Pilih obat untuk ditambahkan ke resep pasien
+                    </p>
+                </div>
+
+                <input type="text"
+                    placeholder="Cari obat..."
+                    class="px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </div>
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full text-sm">
+
+                    <thead class="bg-slate-50">
+
+                        <tr class="text-slate-500">
+
+                            <th class="text-left px-6 py-4 font-semibold">
+                                Nama Obat
+                            </th>
+
+                            <th class="text-left px-6 py-4 font-semibold">
+                                Stok
+                            </th>
+
+                            <th class="text-left px-6 py-4 font-semibold">
+                                Harga
+                            </th>
+
+                            <th class="text-center px-6 py-4 font-semibold">
+                                Jumlah
+                            </th>
+
+                            <th class="text-center px-6 py-4 font-semibold">
+                                Aksi
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody class="divide-y divide-slate-100">
+
+                        <tr class="hover:bg-slate-50">
+
+                            <td class="px-6 py-4 font-semibold text-slate-700">
+                                Paracetamol 500mg
+                            </td>
+
+                            <td class="px-6 py-4 text-slate-500">
+                                120
+                            </td>
+
+                            <td class="px-6 py-4 text-slate-500">
+                                Rp 15.000
+                            </td>
+
+                            <td class="px-6 py-4 text-center">
+
+                                <input type="number"
+                                    value="1"
+                                    class="w-20 px-3 py-2 rounded-xl border border-slate-200 text-center">
+
+                            </td>
+
+                            <td class="px-6 py-4 text-center">
+
+                                <button
+                                    class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold transition-all">
+                                    Tambah
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                        <tr class="hover:bg-slate-50">
+
+                            <td class="px-6 py-4 font-semibold text-slate-700">
+                                Amoxicillin 500mg
+                            </td>
+
+                            <td class="px-6 py-4 text-slate-500">
+                                80
+                            </td>
+
+                            <td class="px-6 py-4 text-slate-500">
+                                Rp 25.000
+                            </td>
+
+                            <td class="px-6 py-4 text-center">
+
+                                <input type="number"
+                                    value="1"
+                                    class="w-20 px-3 py-2 rounded-xl border border-slate-200 text-center">
+
+                            </td>
+
+                            <td class="px-6 py-4 text-center">
+
+                                <button
+                                    class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold transition-all">
+                                    Tambah
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- KERANJANG -->
+    <div class="xl:col-span-4">
+
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sticky top-6">
+
+            <h3 class="text-lg font-bold text-slate-800 mb-5">
+                Keranjang Resep
+            </h3>
+
+            <div class="space-y-4">
+
+                <div class="border border-slate-200 rounded-2xl p-4">
+
+                    <div class="flex justify-between items-start">
+
+                        <div>
+                            <h4 class="font-semibold text-slate-700">
+                                Paracetamol 500mg
+                            </h4>
+
+                            <p class="text-sm text-slate-400 mt-1">
+                                Qty: 2
+                            </p>
+                        </div>
+
+                        <button class="text-red-500 hover:text-red-700">
+                            ✕
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="border border-slate-200 rounded-2xl p-4">
+
+                    <div class="flex justify-between items-start">
+
+                        <div>
+                            <h4 class="font-semibold text-slate-700">
+                                Amoxicillin 500mg
+                            </h4>
+
+                            <p class="text-sm text-slate-400 mt-1">
+                                Qty: 1
+                            </p>
+                        </div>
+
+                        <button class="text-red-500 hover:text-red-700">
+                            ✕
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-slate-100">
+
+                <button
+                    class="w-full px-6 py-4 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-semibold transition-all shadow-lg shadow-sky-200">
+                    Buat Resep
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

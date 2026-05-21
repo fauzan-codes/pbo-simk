@@ -19,7 +19,6 @@
     --color-amber-50: oklch(98.7% 0.022 95.277);
     --color-amber-100: oklch(96.2% 0.059 95.617);
     --color-amber-200: oklch(92.4% 0.12 95.746);
-    --color-amber-500: oklch(76.9% 0.188 70.08);
     --color-amber-600: oklch(66.6% 0.179 58.318);
     --color-amber-700: oklch(55.5% 0.163 48.998);
     --color-yellow-100: oklch(97.3% 0.071 103.193);
@@ -50,7 +49,6 @@
     --color-sky-500: oklch(68.5% 0.169 237.323);
     --color-sky-600: oklch(58.8% 0.158 241.966);
     --color-sky-700: oklch(50% 0.134 242.749);
-    --color-sky-900: oklch(39.1% 0.09 240.876);
     --color-blue-50: oklch(97% 0.014 254.604);
     --color-blue-100: oklch(93.2% 0.032 255.585);
     --color-blue-200: oklch(88.2% 0.059 254.128);
@@ -333,6 +331,9 @@
   }
   .top-3 {
     top: calc(var(--spacing) * 3);
+  }
+  .top-6 {
+    top: calc(var(--spacing) * 6);
   }
   .top-8 {
     top: calc(var(--spacing) * 8);
@@ -853,6 +854,11 @@
       border-color: var(--color-slate-50);
     }
   }
+  .divide-slate-100 {
+    :where(& > :not(:last-child)) {
+      border-color: var(--color-slate-100);
+    }
+  }
   .truncate {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1137,6 +1143,9 @@
   .bg-sky-500 {
     background-color: var(--color-sky-500);
   }
+  .bg-sky-600 {
+    background-color: var(--color-sky-600);
+  }
   .bg-slate-50 {
     background-color: var(--color-slate-50);
   }
@@ -1295,6 +1304,9 @@
   }
   .py-4 {
     padding-block: calc(var(--spacing) * 4);
+  }
+  .py-5 {
+    padding-block: calc(var(--spacing) * 5);
   }
   .py-8 {
     padding-block: calc(var(--spacing) * 8);
@@ -1563,9 +1575,6 @@
   .text-sky-700 {
     color: var(--color-sky-700);
   }
-  .text-sky-900 {
-    color: var(--color-sky-900);
-  }
   .text-slate-300 {
     color: var(--color-slate-300);
   }
@@ -1688,6 +1697,12 @@
     --tw-shadow-color: oklch(95.1% 0.026 236.824);
     @supports (color: color-mix(in lab, red, red)) {
       --tw-shadow-color: color-mix(in oklab, var(--color-sky-100) var(--tw-shadow-alpha), transparent);
+    }
+  }
+  .shadow-sky-200 {
+    --tw-shadow-color: oklch(90.1% 0.058 230.902);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-shadow-color: color-mix(in oklab, var(--color-sky-200) var(--tw-shadow-alpha), transparent);
     }
   }
   .ring-blue-50 {
@@ -1884,6 +1899,13 @@
       }
     }
   }
+  .hover\:border-sky-300 {
+    &:hover {
+      @media (hover: hover) {
+        border-color: var(--color-sky-300);
+      }
+    }
+  }
   .hover\:bg-black\/5 {
     &:hover {
       @media (hover: hover) {
@@ -1957,6 +1979,13 @@
       }
     }
   }
+  .hover\:bg-sky-700 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-sky-700);
+      }
+    }
+  }
   .hover\:bg-slate-50 {
     &:hover {
       @media (hover: hover) {
@@ -2023,6 +2052,13 @@
     &:hover {
       @media (hover: hover) {
         color: var(--color-red-600);
+      }
+    }
+  }
+  .hover\:text-red-700 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-red-700);
       }
     }
   }
@@ -2322,9 +2358,34 @@
       grid-column: span 3 / span 3;
     }
   }
+  .xl\:col-span-4 {
+    @media (width >= 80rem) {
+      grid-column: span 4 / span 4;
+    }
+  }
+  .xl\:col-span-8 {
+    @media (width >= 80rem) {
+      grid-column: span 8 / span 8;
+    }
+  }
+  .xl\:col-span-9 {
+    @media (width >= 80rem) {
+      grid-column: span 9 / span 9;
+    }
+  }
+  .xl\:col-span-12 {
+    @media (width >= 80rem) {
+      grid-column: span 12 / span 12;
+    }
+  }
   .xl\:grid-cols-4 {
     @media (width >= 80rem) {
       grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .xl\:grid-cols-12 {
+    @media (width >= 80rem) {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
     }
   }
 }

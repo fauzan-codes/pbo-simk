@@ -1,5 +1,5 @@
+# pelayanan/models.py
 from django.db import models
-from administrasi.models import Tiket 
 
 class Kunjungan(models.Model):
     pasien = models.ForeignKey('accounts.Pasien', on_delete=models.CASCADE)
@@ -10,27 +10,6 @@ class Kunjungan(models.Model):
 
     class Meta:
         db_table = 'kunjungan'
-
-    @classmethod
-    def generateNomorAntrean(cls, jadwal, tanggal_kunjungan):
-        last_instance = cls.objects.filter(
-            tanggal_kunjungan=tanggal_kunjungan,
-            jadwal__poli=jadwal.poli
-        ).order_by('nomor_antrean').last()
-
-        return last_instance.nomor_antrean + 1 if last_instance else 1
-    
-    @classmethod
-    def changeStatus(cls, kunjungan_id, status_baru):
-        return cls.objects.filter(id=kunjungan_id).update(status=status_baru)
-
-    @property
-    def kode_antrean(self):
-        if self.jadwal and self.jadwal.poli and self.nomor_antrean:
-            kode_poli = self.jadwal.poli.kode_poli
-            return f"{kode_poli}{str(self.nomor_antrean).zfill(3)}"
-        return "N/A"
-        
 
 class RekamMedis(models.Model):
     kunjungan = models.OneToOneField(Kunjungan, on_delete=models.CASCADE)
@@ -47,4 +26,4 @@ class TindakanRekamMedis(models.Model):
     tindakan_medis = models.ForeignKey('master_data.TindakanMedis', on_delete=models.CASCADE)
 
     class Meta:
-        db_table = 'tindakan_rekam_medis'
+        db_table = 'tindak_rekam_medis'
