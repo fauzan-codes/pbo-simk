@@ -65,10 +65,8 @@ def rawat_pasien_detail(request, kunjungan_id=None):
         diagnosa = request.POST.get('diagnosa', '').strip()
         tekanan_darah = request.POST.get('tekanan_darah', '').strip()
         suhu_tubuh = request.POST.get('suhu_tubuh', '').strip()
-
         tindakan_ids = request.POST.getlist('tindakan_ids')
 
-        # VALIDASI
         if not keluhan:
             messages.error(
                 request,
@@ -124,7 +122,6 @@ def rawat_pasien_detail(request, kunjungan_id=None):
                 kunjungan_id=kunjungan.id
             )
 
-        # SIMPAN DATA
         rekam_medis, created = RekamMedis.objects.get_or_create(
             kunjungan=kunjungan,
             defaults={
@@ -147,7 +144,6 @@ def rawat_pasien_detail(request, kunjungan_id=None):
         ).delete()
 
         for tindakan_id in tindakan_ids:
-
             tindakan = TindakanMedis.objects.get(
                 id=tindakan_id
             )

@@ -1,4 +1,3 @@
-# pelayanan/urls.py
 from django.urls import path
 from .views import *
 
@@ -27,4 +26,5 @@ urlpatterns = [
         resep_obat_index,
         name='resep_obat_detail'
     ),
+    
 ]

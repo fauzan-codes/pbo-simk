@@ -1,4 +1,3 @@
-# pelayanan/models.py
 from django.db import models
 from administrasi.models import Tiket 
 
