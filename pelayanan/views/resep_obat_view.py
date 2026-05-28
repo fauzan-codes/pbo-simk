@@ -1,29 +1,28 @@
-# pelayanan/views/resep_obat_view
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
-from pelayanan.models import (
-    Kunjungan,
-    RekamMedis,
-)
-
-from farmasi.models import (
-    Obat,
-    Resep,
-    DetailResep
-)
+from pelayanan.models import Kunjungan, RekamMedis
+from farmasi.models import Obat, Resep, DetailResep
 
 
 @login_required
 def resep_obat_index(request, kunjungan_id=None):
+    # if not hasattr(request.user, 'dokter'):
+    #     messages.error(
+    #         request,
+    #         'Akun ini bukan akun dokter.'
+    #     )
+    #     return redirect('dashboard')
+    # dokter = request.user.dokter
+
     if kunjungan_id:
         kunjungan = Kunjungan.objects.select_related(
             'pasien__user',
             'jadwal__dokter__user',
             'jadwal__poli'
         ).filter(
-            id=kunjungan_id
+            id=kunjungan_id,
+            # jadwal__dokter = dokter
         ).first()
 
     else:
@@ -32,8 +31,19 @@ def resep_obat_index(request, kunjungan_id=None):
             'jadwal__dokter__user',
             'jadwal__poli'
         ).filter(
+            # jadwal__dokter = dokter,
             status__in=['rawat', 'resep']
         ).order_by('id').first()
+
+    # if (kunjungan and kunjungan.dokter_penanggung_jawab and kunjungan.dokter_penanggung_jawab != dokter):
+    #     messages.error(
+    #         request,
+    #         'Pasien sedang ditangani dokter lain.'
+    #     )
+
+    #     return redirect(
+    #         'resep_obat_index'
+    #     )
 
     if not kunjungan:
         context = {

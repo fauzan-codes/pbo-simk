@@ -4,6 +4,7 @@ from administrasi.models import Tiket
 class Kunjungan(models.Model):
     pasien = models.ForeignKey('accounts.Pasien', on_delete=models.CASCADE)
     jadwal = models.ForeignKey('master_data.JadwalPraktik', on_delete=models.CASCADE)
+    # dokter_penanggung_jawab = models.ForeignKey('accounts.Dokter', on_delete=models.SET_NULL, null=True, blank=True)
     tanggal_kunjungan = models.DateField()
     nomor_antrean = models.PositiveIntegerField()
     status = models.CharField(max_length=20, default='diproses')

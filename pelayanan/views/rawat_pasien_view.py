@@ -1,4 +1,3 @@
-# pelayanan/views/rawat_pasien_view.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -8,13 +7,22 @@ from master_data.models import TindakanMedis
 
 @login_required
 def rawat_pasien_detail(request, kunjungan_id=None):
+    # if not hasattr(request.user, 'dokter'):
+    #     messages.error(
+    #         request,
+    #         'Akun ini bukan akun dokter.'
+    #     )
+    #     return redirect('dashboard')
+    # dokter = request.user.dokter
+
     if kunjungan_id:
         kunjungan = Kunjungan.objects.select_related(
             'pasien__user',
             'jadwal__dokter__user',
             'jadwal__poli'
         ).filter(
-            id=kunjungan_id
+            id=kunjungan_id,
+            # jadwal__dokter = dokter
         ).first()
 
     else:
@@ -23,12 +31,25 @@ def rawat_pasien_detail(request, kunjungan_id=None):
             'jadwal__dokter__user',
             'jadwal__poli'
         ).filter(
+            # jadwal__dokter = dokter,
             status__in=['diproses', 'rawat']
         ).order_by('id').first()
 
     if kunjungan and kunjungan.status == 'diproses':
         kunjungan.status = 'rawat'
+        # kunjungan.dokter_penanggung_jawab = dokter
         kunjungan.save()
+
+    # if (kunjungan and kunjungan.dokter_penanggung_jawab and kunjungan.dokter_penanggung_jawab != dokter):
+    #     messages.error(
+    #         request,
+    #         'Pasien sedang ditangani dokter lain.'
+    #     )
+
+    #     return redirect(
+    #         'rawat_pasien_index'
+    #     )
+
 
     if not kunjungan:
         context = {
