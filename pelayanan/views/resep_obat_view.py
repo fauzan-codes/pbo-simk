@@ -165,3 +165,4 @@ def resep_obat_index(request, kunjungan_id=None):
         'pages/pelayanan/resep_obat/index.html',
         context
     )
+

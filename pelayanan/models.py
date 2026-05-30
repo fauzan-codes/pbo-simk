@@ -6,7 +6,7 @@ class Kunjungan(models.Model):
     jadwal = models.ForeignKey('master_data.JadwalPraktik', on_delete=models.CASCADE)
     tanggal_kunjungan = models.DateField()
     nomor_antrean = models.PositiveIntegerField()
-    status = models.CharField(max_length=20, default='menunggu')
+    status = models.CharField(max_length=20, default='diproses')
 
     class Meta:
         db_table = 'kunjungan'
@@ -37,7 +37,7 @@ class RekamMedis(models.Model):
     keluhan = models.TextField()
     diagnosa = models.TextField()
     tekanan_darah = models.CharField(max_length=20)
-    suhu_tubuh = models.DecimalField(max_digits=4, decimal_places=1)
+    suhu_tubuh = models.DecimalField(max_digits=4, decimal_places=1, blank=True, null=True)
 
     class Meta:
         db_table = 'rekam_medis'
@@ -48,3 +48,7 @@ class TindakanRekamMedis(models.Model):
 
     class Meta:
         db_table = 'tindakan_rekam_medis'
+
+
+
+
