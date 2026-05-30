@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from accounts import views as accounts_views
 from master_data import views as master_data_views
 from farmasi import views as farmasi_views

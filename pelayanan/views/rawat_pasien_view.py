@@ -4,7 +4,6 @@ from django.contrib import messages
 from pelayanan.models import Kunjungan, RekamMedis, TindakanRekamMedis
 from master_data.models import TindakanMedis
 
-
 @login_required
 def rawat_pasien_detail(request, kunjungan_id=None):
     if request.user.role != 'dokter':
