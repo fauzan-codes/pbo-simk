@@ -14,39 +14,45 @@
     <table id="pasienTable" class="w-full text-sm text-left">
         <thead>
             <tr class="text-slate-400 border-b border-slate-100">
-                <th class="pb-4 font-semibold uppercase tracking-wider">No. Antrean</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">No. Invoice</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider min-w-[300px]">Nama Pasien</th>
-                <th class="pb-4 font-semibold uppercase tracking-wider">Poli</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Grand Total</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider">Tanggal Kunjungan</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Tanggal Pembayaran</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider text-center">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-50">
-            {% for item in data_kunjungan %}
+            {% for item in data_tagihan %}
             <tr class="hover:bg-slate-50/50 transition-colors">
                 <td class="py-4">
                     <p class="font-semibold text-slate-700">
-                        {{ item.kode_antrean }}
+                        {{ item.nomor_invoice }}
                     </p>
                 </td>
                 <td class="py-4">
                     <p class="font-semibold text-slate-700">
-                        {{ item.pasien.user.full_name }}
+                        {{ item.kunjungan.pasien.user.full_name }}
                     </p>
                 </td>
                 <td class="py-4 text-slate-600">
                     <p class="font-semibold text-slate-700">
-                        {{ item.jadwal.poli.nama_poli }}
+                        {{ item.grand_total }}
                     </p>
                 </td>
                 <td class="py-4">
                     <p class="font-semibold text-slate-700">
-                        {{ item.tanggal_kunjungan }}
+                        {{ item.kunjungan.tanggal_kunjungan }}
+                    </p>
+                </td>
+                <td class="py-4">
+                    <p class="font-semibold text-slate-700">
+                        {{ item.waktu_pembayaran }}
                     </p>
                 </td>
                 <td class="py-4">
                     <div class="flex justify-center items-center gap-2">
-                        <a href="{% url 'buat_tagihan_index' item.id %}">
+                        <a href="{% url 'keuangan_tagihan_index' %}">
                             {% include 'components/ui/button.html' with variant='primary' label='Buat Tagihan' %}
                         </a>
                     </div>
@@ -54,7 +60,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="py-8 text-center text-slate-400 italic">Belum ada data pasien.</td>
+                <td colspan="6" class="py-8 text-center text-slate-400 italic">Belum ada data pasien.</td>
             </tr>
             {% endfor %}
         </tbody>
