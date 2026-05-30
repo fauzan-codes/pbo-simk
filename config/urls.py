@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from accounts import views as accounts_views
 from master_data import views as master_data_views
 from farmasi import views as farmasi_views
@@ -88,5 +88,7 @@ urlpatterns = [
     path('api/antrean/panggil/', administrasi_views.api_panggil_pasien, name="api_panggil_pasien"),
     path('monitor/', administrasi_views.monitor_index, name="monitor_index"),
     
-    path('api/antrean/set_loket/', administrasi_views.api_set_loket, name='api_set_loket'),         
+    path('api/antrean/set_loket/', administrasi_views.api_set_loket, name='api_set_loket'),
+    
+    path('pelayanan/', include('pelayanan.urls')),         
 ]
