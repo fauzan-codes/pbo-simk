@@ -1,0 +1,380 @@
+{% extends 'layouts/main.html' %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block dashboard_content %}
+
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">
+        {{ page_title }}
+    </h1>
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+    {% if not kunjungan %}
+    <div class="xl:col-span-12">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-10 text-center">
+            <h3 class="text-xl font-bold text-slate-700 mb-3">
+                Belum Ada Pasien
+            </h3>
+
+            <p class="text-slate-400">
+                Tidak ada antrian pasien.
+            </p>
+        </div>
+    </div>
+    {% else %}
+
+    <div class="xl:col-span-9 space-y-6">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">
+                        Informasi Pasien
+                    </h3>
+                </div>
+            </div>
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+                <div>
+                    <p class="text-xs text-slate-400 uppercase mb-1">
+                        Nama Pasien
+                    </p>
+                    <h4 class="font-semibold text-slate-700">
+                        {{ kunjungan.pasien.user.full_name }}
+                    </h4>
+                </div>
+
+                <div>
+                    <p class="text-xs text-slate-400 uppercase mb-1">
+                        Nomor RM
+                    </p>
+                    <h4 class="font-semibold text-slate-700">
+                        {{ kunjungan.pasien.nomor_rekam_medis }}
+                    </h4>
+                </div>
+
+                <div>
+                    <p class="text-xs text-slate-400 uppercase mb-1">
+                        Poli
+                    </p>
+                    <h4 class="font-semibold text-slate-700">
+                        {{ kunjungan.jadwal.poli.nama_poli }}
+                    </h4>
+                </div>
+
+                <div>
+                    <p class="text-xs text-slate-400 uppercase mb-1">
+                        Dokter
+                    </p>
+                    <h4 class="font-semibold text-slate-700">
+                        {{ kunjungan.jadwal.dokter.user.full_name }}
+                    </h4>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+
+            <h3 class="text-lg font-bold text-slate-800 mb-6">
+                Form Pemeriksaan Pasien
+            </h3>
+
+            <form method="POST" class="space-y-6" id="rawatPasienForm">
+                {% csrf_token %}
+                <div>
+                    <label class="text-sm font-semibold text-slate-600 block mb-2">
+                        Keluhan Pasien
+                    </label>
+                    <textarea name="keluhan" id="keluhan" rows="4" required class="w-full rounded-2xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        placeholder="Masukkan keluhan pasien...">{{ rekam_medis.keluhan|default:'' }}</textarea>
+                </div>
+
+                <div>
+                    <label class="text-sm font-semibold text-slate-600 block mb-2">
+                        Diagnosa
+                    </label>
+                    <textarea name="diagnosa" id="diagnosa" rows="4" required class="w-full rounded-2xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        placeholder="Masukkan hasil diagnosa dokter...">{{ rekam_medis.diagnosa|default:'' }}</textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-semibold text-slate-600 block mb-2">
+                            Tekanan Darah
+                        </label>
+                        <input type="text" id="tekanan_darah" name="tekanan_darah" required value="{{ rekam_medis.tekanan_darah|default:'' }}"
+                            placeholder="120/80"
+                            class="w-full rounded-2xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-semibold text-slate-600 block mb-2">
+                            Suhu Tubuh
+                        </label>
+                        <input type="number" step="0.1" id="suhu_tubuh" name="suhu_tubuh" required value="{{ rekam_medis.suhu_tubuh|default:'' }}"
+                            placeholder="36.5"
+                            class="w-full rounded-2xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        >
+                    </div>
+
+                </div>
+
+                <div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <label class="text-sm font-semibold text-slate-600">
+                                Tindakan Medis
+                            </label>
+                            <span class="text-xs text-slate-400">
+                                Pilih tindakan yang dilakukan
+                            </span>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-2xl p-4 max-h-[350px] overflow-y-auto">
+                            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+
+                                {% for tindakan in tindakan_list %}
+
+                                <label class="flex items-start gap-3 rounded-xl border border-slate-200 p-3 cursor-pointer hover:border-sky-400 hover:bg-sky-50/40 transition-all">
+                                    <input type="checkbox" name="tindakan_ids" value="{{ tindakan.id }}" class="mt-1 w-4 h-4 text-sky-600 rounded"
+                                        {% if tindakan.id in selected_tindakan_ids %} checked {% endif %}
+                                    >
+                                    <div class="overflow-hidden">
+                                        <p class="text-sm font-semibold text-slate-700 leading-tight">
+                                            {{ tindakan.nama_tindakan }}
+                                        </p>
+                                    </div>
+
+                                </label>
+
+                                {% empty %}
+
+                                <div class="col-span-full text-sm text-slate-400">
+                                    Belum ada data tindakan medis.
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                    {% comment %} <button type="button"
+                        class="px-6 py-3 rounded-2xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition-all">
+                        Simpan Draft
+                    </button> {% endcomment %}
+                    <button type="submit"
+                        class="px-6 py-3 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-semibold shadow-lg shadow-sky-200 transition-all">
+                        Finalisasi Data Medis
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-800">
+                    Riwayat Rekam Medis
+                </h3>
+            </div>
+
+            <div class="divide-y divide-slate-100">
+                {% for riwayat in riwayat_rekam_medis %}
+                <div class="p-6 flex items-start justify-between">
+
+                    <div>
+                        <p class="font-semibold text-slate-700">
+                            {{ riwayat.diagnosa }}
+                        </p>
+                        <p class="text-sm text-slate-400 mt-1">
+                            {{ riwayat.kunjungan.tanggal_kunjungan }}
+                        </p>
+                    </div>
+
+                    <span class="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-xs font-bold">
+                        Selesai
+                    </span>
+
+                </div>
+
+                {% empty %}
+
+                <div class="p-6 text-sm text-slate-400">
+                    Belum ada riwayat rekam medis.
+                </div>
+
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="xl:col-span-3">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sticky top-6">
+            <h3 class="text-lg font-bold text-slate-800 mb-5">
+                Informasi Antrian
+            </h3>
+
+            <div class="space-y-4">
+
+                <div class="bg-slate-50 rounded-2xl p-4">
+                    <p class="text-xs text-slate-400 uppercase">
+                        Nomor Antrian
+                    </p>
+                    <h4 class="text-3xl font-bold text-sky-600 mt-2">
+                        {{ kunjungan.kode_antrean }}
+                    </h4>
+                </div>
+
+                {% comment %} <div class="bg-slate-50 rounded-2xl p-4">
+                    <p class="text-xs text-slate-400 uppercase">
+                        Status
+                    </p>
+                    <h4 class="text-sm font-bold text-emerald-600 mt-2">
+                        {{ kunjungan.status }}
+                    </h4>
+                </div> {% endcomment %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const kunjunganId = '{{ kunjungan.id }}';
+
+        if (!kunjunganId) {
+            return;
+        }
+
+        const storageKey = `rawat_pasien_${kunjunganId}`;
+        const form = document.getElementById('rawatPasienForm');
+
+        if (!form) {
+            return;
+        }
+
+        const keluhanField = document.getElementById('keluhan');
+        const diagnosaField = document.getElementById('diagnosa');
+        const tekananDarahField = document.getElementById('tekanan_darah');
+        const suhuTubuhField = document.getElementById('suhu_tubuh');
+        const tindakanCheckboxes = document.querySelectorAll('input[name="tindakan_ids"]');
+
+        function loadDraft() {
+            const savedDraft = localStorage.getItem(
+                storageKey
+            );
+
+            if (!savedDraft) {
+                return;
+            }
+
+            const data = JSON.parse(savedDraft);
+
+            if (
+                keluhanField &&
+                !keluhanField.value
+            ) {
+                keluhanField.value = data.keluhan || '';
+            }
+
+            if (
+                diagnosaField &&
+                !diagnosaField.value
+            ) {
+                diagnosaField.value = data.diagnosa || '';
+            }
+
+            if (
+                tekananDarahField &&
+                !tekananDarahField.value
+            ) {
+                tekananDarahField.value =
+                    data.tekanan_darah || '';
+            }
+
+            if (
+                suhuTubuhField &&
+                !suhuTubuhField.value
+            ) {
+                suhuTubuhField.value =
+                    data.suhu_tubuh || '';
+            }
+
+            if (data.tindakan_ids) {
+                tindakanCheckboxes.forEach(item => {
+                    item.checked = data.tindakan_ids.includes(
+                        item.value
+                    );
+                });
+            }
+        }
+
+        function saveDraft() {
+            const tindakanIds = [];
+            tindakanCheckboxes.forEach(item => {
+                if (item.checked) {
+                    tindakanIds.push(item.value);
+                }
+            });
+
+            const draftData = {
+                keluhan: keluhanField.value,
+                diagnosa: diagnosaField.value,
+                tekanan_darah: tekananDarahField.value,
+                suhu_tubuh: suhuTubuhField.value,
+                tindakan_ids: tindakanIds,
+            };
+
+            localStorage.setItem(
+                storageKey,
+                JSON.stringify(draftData)
+            );
+
+        }
+
+        if (keluhanField) {
+            keluhanField.addEventListener(
+                'input',
+                saveDraft
+            );
+        }
+
+        if (diagnosaField) {
+            diagnosaField.addEventListener(
+                'input',
+                saveDraft
+            );
+        }
+
+        if (tekananDarahField) {
+            tekananDarahField.addEventListener(
+                'input',
+                saveDraft
+            );
+        }
+
+        if (suhuTubuhField) {
+            suhuTubuhField.addEventListener(
+                'input',
+                saveDraft
+            );
+        }
+
+        tindakanCheckboxes.forEach(item => {
+            item.addEventListener(
+                'change',
+                saveDraft
+            );
+        });
+        loadDraft();
+    });
+</script>
+{% endblock %}

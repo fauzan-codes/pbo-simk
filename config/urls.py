@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from accounts import views as accounts_views
 from master_data import views as master_data_views
 from farmasi import views as farmasi_views
@@ -49,6 +49,8 @@ urlpatterns = [
     path('tindakan/create', master_data_views.tindakan_medis_create, name="tindakan_medis_create"),
     path('tindakan/<int:id>/edit', master_data_views.tindakan_medis_edit, name="tindakan_medis_edit"),
     path('tindakan/<int:id>/delete', master_data_views.tindakan_medis_delete, name="tindakan_medis_delete"),
+
+    path('pelayanan/', include('pelayanan.urls')),
 
     path('jadwal/', master_data_views.jadwal_praktik_index, name="jadwal_praktik_index"),
     path('jadwal/create', master_data_views.jadwal_praktik_create, name="jadwal_praktik_create"),

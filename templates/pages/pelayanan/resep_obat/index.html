@@ -1,0 +1,438 @@
+{% extends 'layouts/main.html' %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block dashboard_content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">
+        {{ page_title }}
+    </h1>
+
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+{% if not kunjungan %}
+
+<div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-10 text-center">
+    <h3 class="text-xl font-bold text-slate-700 mb-3">
+        Belum Ada Pasien
+    </h3>
+
+    <p class="text-slate-400">
+        Tidak ada antrian pasien.
+    </p>
+</div>
+
+{% else %}
+
+{% if not is_rekam_medis_exist %}
+
+<div class="bg-amber-50 border border-amber-200 rounded-3xl p-6 mb-6">
+    <div class="flex items-center justify-between gap-4 flex-wrap">
+
+        <div>
+            <h3 class="text-lg font-bold text-amber-700 mb-2">
+                Pemeriksaan Belum Disubmit
+            </h3>
+
+            <p class="text-sm text-amber-600">
+                Harus menyelesaikan data pemeriksaan terlebih dahulu sebelum membuat resep obat.
+            </p>
+        </div>
+
+        <a href="{% url 'rawat_pasien_detail' kunjungan.id %}"
+        class="px-5 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-all">
+            Kembali ke Rawat
+        </a>
+
+    </div>
+</div>
+
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        <div class="xl:col-span-8 space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">
+                            Informasi Pasien
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase mb-1">
+                            Nama Pasien
+                        </p>
+
+                        <h4 class="font-semibold text-slate-700">
+                            {{ kunjungan.pasien.user.full_name }}
+                        </h4>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase mb-1">
+                            Nomor RM
+                        </p>
+
+                        <h4 class="font-semibold text-slate-700">
+                            {{ kunjungan.pasien.nomor_rekam_medis }}
+                        </h4>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase mb-1">
+                            Poli
+                        </p>
+
+                        <h4 class="font-semibold text-slate-700">
+                            {{ kunjungan.jadwal.poli.nama_poli }}
+                        </h4>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-slate-400 uppercase mb-1">
+                            Dokter
+                        </p>
+
+                        <h4 class="font-semibold text-slate-700">
+                            {{ kunjungan.jadwal.dokter.user.full_name }}
+                        </h4>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">
+                                Daftar Obat
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3">
+                <div class="overflow-x-auto">
+                    <table id="resepObatTable" class="w-full text-sm text-left">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-100">
+
+                                <th class="pb-4 font-semibold uppercase tracking-wider">
+                                    Pilih
+                                </th>
+
+                                <th class="pb-4 font-semibold uppercase tracking-wider">
+                                    ID
+                                </th>
+
+                                <th class="pb-4 font-semibold uppercase tracking-wider">
+                                    Nama Obat
+                                </th>
+
+                                <th class="pb-4 font-semibold uppercase tracking-wider">
+                                    Satuan
+                                </th>
+
+                                <th class="pb-4 font-semibold uppercase tracking-wider">
+                                    Harga
+                                </th>
+
+                                <th class="pb-4 font-semibold uppercase tracking-wider">
+                                    Kategori
+                                </th>
+
+                                <th class="pb-4 font-semibold uppercase tracking-wider">
+                                    Stok
+                                </th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-slate-50">
+                            {% for obat in obat_list %}
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-4">
+                                    <label class="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            name="obat_ids"
+                                            value="{{ obat.id }}"
+                                            {% comment %} data-nama="{{ obat.kategori.nama_kategori }}" {% endcomment %}
+                                            data-nama="{{ obat.kode_obat }}"
+                                            data-harga="{{ obat.harga_jual }}"
+                                            class="obat-checkbox w-5 h-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                                        >
+                                    </label>
+                                </td>
+
+                                <td class="py-4">
+                                    <p class="font-semibold text-slate-700">
+                                        {{ obat.id }}
+                                    </p>
+                                </td>
+
+                                <td class="py-4">
+                                    <div>
+                                        <p class="font-semibold text-slate-700">
+                                            {{ obat.kode_obat }}
+                                        </p>
+                                    </div>
+                                </td>
+
+                                <td class="py-4">
+                                    <p class="text-slate-600">
+                                        {{ obat.satuan }}
+                                    </p>
+                                </td>
+
+                                <td class="py-4">
+                                    <p class="font-semibold text-slate-700">
+                                        Rp {{ obat.harga_jual }}
+                                    </p>
+                                </td>
+
+                                <td class="py-4">
+                                    <p class="font-semibold text-slate-700">
+                                        {{ obat.kategori_id }}
+                                    </p>
+                                </td>
+
+                                <td class="py-4">
+                                    {% if obat.stok > 10 %}
+                                    <span class="px-3 py-1 rounded-xl bg-emerald-50 text-emerald-600 text-xs font-bold">
+                                        {{ obat.stok }}
+                                    </span>
+                                    {% elif obat.stok > 0 %}
+                                    <span class="px-3 py-1 rounded-xl bg-amber-50 text-amber-600 text-xs font-bold">
+                                        {{ obat.stok }}
+                                    </span>
+                                    {% else %}
+
+                                    <span class="px-3 py-1 rounded-xl bg-red-50 text-red-600 text-xs font-bold">
+                                        Habis
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                            {% empty %}
+
+                            <tr>
+                                <td colspan="8" class="py-12 text-center text-slate-400 italic">
+                                    Belum ada data obat.
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+        <div class="xl:col-span-4">
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm sticky top-8 overflow-hidden">
+                <div class="p-6 border-b border-slate-100 bg-gradient-to-r from-sky-50 to-white">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 mb-1">
+                                Keranjang Obat
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 overflow-y-auto flex-1">
+                    <div id="keranjangKosong"
+                    class="flex flex-col items-center justify-center py-12 text-center">
+                        <div class="w-20 h-20 rounded-3xl bg-slate-100 flex items-center justify-center mb-4">
+                            <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M3 3h2l.4 2m0 0L7 13h10l2-8H5.4M7 13l-1.293 1.293A1 1 0 006.414 16H19m-12 0a2 2 0 104 0m8 0a2 2 0 104 0"/>
+                            </svg>
+                        </div>
+
+                        <h4 class="font-semibold text-slate-600 mb-1">
+                            Belum ada obat dipilih
+                        </h4>
+
+                        <p class="text-sm text-slate-400">
+                            Pilih obat dari tabel untuk membuat resep.
+                        </p>
+                    </div>
+
+                    <div id="keranjangList" class="space-y-4 hidden"></div>
+                </div>
+
+                <div class="border-t border-slate-100 p-4 bg-slate-50">
+                    <div class="flex items-center justify-between mb-5">
+                        <span class="text-sm text-slate-500">
+                            Total Obat
+                        </span>
+
+                        <span id="totalObat"
+                        class="text-lg font-bold text-slate-800">
+                            0
+                        </span>
+                    </div>
+
+                    <button
+                        type="submit"
+                        {% if not is_rekam_medis_exist %}disabled{% endif %}
+                        id="submitButton"
+                        class="w-full px-6 py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold transition-all disabled:bg-slate-300 disabled:cursor-not-allowed"
+                    >
+                        Finalisasi Resep
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (document.getElementById("resepObatTable")) {
+            new simpleDatatables.DataTable("#resepObatTable", {
+                searchable: true,
+                perPage: 10,
+                labels: {
+                    placeholder: "Cari obat...",
+                    perPage: "Data per halaman",
+                    noRows: "Data tidak ditemukan",
+                    info: "Menampilkan {start} sampai {end} dari {rows} data",
+                }
+            });
+        }
+
+        const kunjunganId = '{{ kunjungan.id }}';
+        if (!kunjunganId) {
+            return;
+        }
+
+        const storageKey = `resep_obat_${kunjunganId}`;
+        const form = document.querySelector('form');
+        const checkboxes = document.querySelectorAll('.obat-checkbox');
+        const keranjangList = document.getElementById('keranjangList');
+        const keranjangKosong = document.getElementById('keranjangKosong');
+        const totalObat = document.getElementById('totalObat');
+
+        function saveDraft() {
+            const selectedObat = [];
+
+            checkboxes.forEach(item => {
+                if (item.checked) {
+                    selectedObat.push(item.value);
+                }
+
+            });
+
+            localStorage.setItem(
+                storageKey,
+                JSON.stringify({obat_ids: selectedObat})
+            );
+        }
+
+        function loadDraft() {
+            const savedDraft = localStorage.getItem(storageKey);
+
+            if (!savedDraft) {
+                renderKeranjang();
+                return;
+            }
+
+            const data = JSON.parse(savedDraft);
+
+            if (data.obat_ids) {
+                checkboxes.forEach(item => {
+                    item.checked = data.obat_ids.includes(item.value);
+                });
+            }
+            renderKeranjang();
+        }
+
+        function renderKeranjang() {
+            keranjangList.innerHTML = '';
+            const selected = document.querySelectorAll('.obat-checkbox:checked');
+            totalObat.textContent = selected.length;
+
+            if (selected.length < 1) {
+                keranjangKosong.classList.remove('hidden');
+                keranjangList.classList.add('hidden');
+                return;
+            }
+
+            keranjangKosong.classList.add('hidden');
+            keranjangList.classList.remove('hidden');
+
+            selected.forEach((item, index) => {
+                const nama = item.dataset.nama;
+                const harga = item.dataset.harga;
+                keranjangList.innerHTML += `
+                    <div class="border border-slate-100 rounded-2xl p-4 hover:border-sky-100 hover:bg-sky-50/30 transition-all">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+
+                                    <span class="w-7 h-7 text-xs font-bold flex items-center justify-center">
+                                        ${index + 1}
+                                    </span>
+
+                                    <h4 class="font-semibold text-slate-700 leading-tight">
+                                        ${nama}
+                                    </h4>
+
+                                </div>
+
+                                <p class="text-sm text-slate-400">
+                                    Harga: Rp ${harga}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        checkboxes.forEach(item => {
+            item.addEventListener(
+                'change',
+                function () {
+                    saveDraft();
+                    renderKeranjang();
+                }
+            );
+
+        });
+
+        if (form) {
+            form.addEventListener(
+                'submit',
+                function () {
+                    localStorage.removeItem(storageKey);
+                    localStorage.removeItem(`rawat_pasien_${kunjunganId}`);
+                }
+            );
+        }
+        loadDraft();
+    });
+</script>
+{% endblock %}
+
