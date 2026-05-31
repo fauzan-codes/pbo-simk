@@ -2381,11 +2381,6 @@
       grid-column: span 3 / span 3;
     }
   }
-  .md\:block {
-    @media (width >= 48rem) {
-      display: block;
-    }
-  }
   .md\:flex {
     @media (width >= 48rem) {
       display: flex;

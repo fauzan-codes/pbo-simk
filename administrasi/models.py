@@ -34,16 +34,10 @@ class Tiket(TimestampModel):
                 return hasil_tiket
             
 
-class Loket(models.Model):
+class Loket(TimestampModel):
     nama_loket = models.CharField(max_length=255, unique=True)
     staff = models.ForeignKey('accounts.Staff', on_delete=models.SET_NULL, null=True)
     kunjungan = models.ForeignKey('pelayanan.Kunjungan', on_delete=models.SET_NULL, null=True)
 
     class Meta:
         db_table = 'loket'
-
-    @classmethod
-    def tutup_loket(self):
-        self.staff = None
-        self.kunjungan = None
-        self.save()

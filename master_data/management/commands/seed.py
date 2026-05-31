@@ -58,7 +58,7 @@ class Command(BaseCommand):
         self.stdout.write('📝 Membuat User...')
         
         # Admin
-        admin = User.objects.create_superuser(
+        admin = User.objects.create_user(
             full_name='Superadmin',
             username='superadmin',
             email='admin@simk.com',
@@ -109,7 +109,6 @@ class Command(BaseCommand):
             email='rina@simk.com',
             password='password',
             role='staff',
-            is_staff=True
         )
         
         Staff.objects.create(
@@ -127,7 +126,6 @@ class Command(BaseCommand):
             email='hendra@simk.com',
             password='password',
             role='staff',
-            is_staff=True
         )
         
         Staff.objects.create(
@@ -145,7 +143,6 @@ class Command(BaseCommand):
             email='diana@simk.com',
             password='password',
             role='staff',
-            is_staff=True
         )
         
         Staff.objects.create(

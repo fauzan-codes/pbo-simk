@@ -104,20 +104,3 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'Anda berhasil keluar.')
     return redirect('login')
-
-def generate_superadmin(request):
-    checkSuperadmin = User.objects.filter(role="admin")
-
-    if checkSuperadmin:
-        messages.error(request, "Akun superadmin sudah ada")
-    else:
-        User.objects.create_superuser(
-            full_name = "Administrator SIMK",
-            username = "superadmin",
-            email = "admin@gmail.com",
-            password = "password",
-            role = "admin"
-        )
-        messages.success(request, "Akun superadmin berhasil dibuat")
-    return redirect('login')
-

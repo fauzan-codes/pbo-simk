@@ -9,8 +9,6 @@ from pelayanan import views as pelayanan_views
 
 urlpatterns = [
     # Account Route
-    path('generate-super-admin/', accounts_views.generate_superadmin, name='generate_super_admin'),
-
     path('admin/', admin.site.urls),
     path('', accounts_views.welcome_view,    name='welcome'),
     path('login/', accounts_views.login_view,    name='login'),
