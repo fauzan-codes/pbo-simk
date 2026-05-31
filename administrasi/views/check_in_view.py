@@ -91,10 +91,18 @@ def check_in_offline(request):
             pasien_id = pasien_id,
             tanggal_kunjungan = tanggal_kunjungan,
             jadwal_id = jadwal_id,
-            nomor_antrean=nomor_baru
+            nomor_antrean=nomor_baru,
+            status="menunggu"
         )
 
         messages.success(request, f'Berhasil mendaftarkan pasien dengan nomor antrean {kunjungan.kode_antrean}')
+
+        request.session['tiket_baru'] = {
+            'kode_antrean': kunjungan.kode_antrean,
+            'nama_pasien': kunjungan.pasien.user.full_name, 
+            'poli': jadwal.poli.nama_poli,
+            'tanggal': tanggal_kunjungan
+        }
 
         return redirect('check_in_offline')
 
@@ -118,5 +126,7 @@ def check_in_offline(request):
         'jadwal_data_json': get_jadwal(),
     }
 
+    if 'tiket_baru' in request.session:
+        context['tiket_baru'] = request.session.pop('tiket_baru')
 
     return render(request, 'pages/administrasi/check_in/offline.html', context)

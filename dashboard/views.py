@@ -33,16 +33,16 @@ def dashboard_view(request):
     elif user.role == 'dokter':
         role_detail = getattr(user, 'dokter_profile', None)
         quick_links = [
-            {'title': 'Mulai Pemeriksaan', 'desc': 'Buka daftar antrean', 'url': '#', 'color': 'text-indigo-600 bg-indigo-100'},
-            {'title': 'Jadwal Praktik', 'desc': 'Atur jam kerja', 'url': '#', 'color': 'text-purple-600 bg-purple-100'},
+            {'title': 'Mulai Pemeriksaan', 'desc': 'Buka daftar antrean', 'url': reverse('rawat_pasien_index'), 'color': 'text-indigo-600 bg-indigo-100'},
+            {'title': 'Jadwal Praktik', 'desc': 'Atur jam kerja', 'url': reverse('jadwal_praktik_index'), 'color': 'text-purple-600 bg-purple-100'},
         ]
         
     elif user.role in ['staff', 'admin']:
         role_detail = getattr(user, 'staff_profile', None) 
         quick_links = [
-            {'title': 'Registrasi Pasien', 'desc': 'Daftarkan pasien baru/lama', 'url': '#', 'color': 'text-rose-600 bg-rose-100'},
+            {'title': 'Registrasi Pasien', 'desc': 'Check in pasien', 'url': reverse('check_in_index'), 'color': 'text-rose-600 bg-rose-100'},
             {'title': 'Modul Kasir', 'desc': 'Kelola pembayaran', 'url': '#', 'color': 'text-green-600 bg-green-100'},
-            {'title': 'Modul Apotek', 'desc': 'Kelola stok obat', 'url': '#', 'color': 'text-cyan-600 bg-cyan-100'},
+            {'title': 'Modul Apotek', 'desc': 'Kelola stok obat', 'url': reverse('stok_obat_index'), 'color': 'text-cyan-600 bg-cyan-100'},
         ]
 
     context = {
