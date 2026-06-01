@@ -1,9 +1,43 @@
 from django.db import models
-from administrasi.models import Tiket 
+from accounts.models import TimestampModel
 
-class Kunjungan(models.Model):
+class TindakanMedis(TimestampModel):
+    kode_tindakan = models.CharField(max_length=10, unique=True, blank=True)
+    nama_tindakan = models.CharField(max_length=100)
+    tarif = models.DecimalField(max_digits=12, decimal_places=2)
+
+    class Meta:
+        db_table = 'tindakan_medis'
+    
+    def save(self, *args, **kwargs):
+        if not self.kode_tindakan:
+            self.kode_tindakan = self.generate_kode_tindakan()
+            
+        super(TindakanMedis, self).save(*args, **kwargs)
+
+    @classmethod
+    def generate_kode_tindakan(cls):
+        prefix = "TND-"
+        
+        last_instance = cls.objects.all().order_by('-id').first()
+        
+        if last_instance and last_instance.kode_tindakan:
+            try:
+                last_number = int(last_instance.kode_tindakan.split('-')[1])
+                new_number = last_number + 1
+            except (IndexError, ValueError):
+                new_number = 1
+        else:
+            new_number = 1
+            
+        return f"{prefix}{str(new_number).zfill(4)}"
+
+    def __str__(self):
+        return f"{self.kode_tindakan} - {self.nama_tindakan}"
+    
+class Kunjungan(TimestampModel):
     pasien = models.ForeignKey('accounts.Pasien', on_delete=models.CASCADE)
-    jadwal = models.ForeignKey('master_data.JadwalPraktik', on_delete=models.CASCADE)
+    jadwal = models.ForeignKey('administrasi.JadwalPraktik', on_delete=models.CASCADE)
     tanggal_kunjungan = models.DateField()
     nomor_antrean = models.PositiveIntegerField()
     status = models.CharField(max_length=20, default='diproses')
@@ -32,7 +66,7 @@ class Kunjungan(models.Model):
         return "N/A"
         
 
-class RekamMedis(models.Model):
+class RekamMedis(TimestampModel):
     kunjungan = models.OneToOneField(Kunjungan, on_delete=models.CASCADE)
     keluhan = models.TextField()
     diagnosa = models.TextField()
@@ -42,12 +76,13 @@ class RekamMedis(models.Model):
     class Meta:
         db_table = 'rekam_medis'
 
-class TindakanRekamMedis(models.Model):
+class TindakanRekamMedis(TimestampModel):
     rekam_medis = models.ForeignKey(RekamMedis, on_delete=models.CASCADE)
-    tindakan_medis = models.ForeignKey('master_data.TindakanMedis', on_delete=models.CASCADE)
+    tindakan_medis = models.ForeignKey('pelayanan.TindakanMedis', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'tindakan_rekam_medis'
+
 
 
 

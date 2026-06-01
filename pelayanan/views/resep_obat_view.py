@@ -4,7 +4,6 @@ from django.contrib import messages
 from pelayanan.models import Kunjungan, RekamMedis
 from farmasi.models import Obat, Resep, DetailResep
 
-
 @login_required
 def resep_obat_index(request, kunjungan_id=None):
     if request.user.role != 'dokter':
@@ -165,3 +164,4 @@ def resep_obat_index(request, kunjungan_id=None):
         'pages/pelayanan/resep_obat/index.html',
         context
     )
+

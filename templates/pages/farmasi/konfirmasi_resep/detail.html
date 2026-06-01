@@ -1,0 +1,155 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+        {% include 'components/ui/breadcrumbs.html' %}  
+    </div>
+    <a href="{% url 'konfirmasi_resep_index' %}" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
+        ← Kembali
+    </a>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- Informasi Resep -->
+    <div class="lg:col-span-2 bg-white rounded-xl border border-slate-100 p-6">
+        <h2 class="text-xl font-bold text-slate-800 mb-6">Informasi Resep</h2>
+        
+        <div class="space-y-4">
+            <div class="flex items-start justify-between pb-4 border-b border-slate-100">
+                <span class="text-slate-600 font-medium">ID Resep</span>
+                <span class="text-slate-800 font-semibold">#{{ resep.id }}</span>
+            </div>
+            
+            <div class="flex items-start justify-between pb-4 border-b border-slate-100">
+                <span class="text-slate-600 font-medium">Tanggal Resep</span>
+                <span class="text-slate-800 font-semibold">{{ resep.tanggal_resep|date:"d M Y H:i" }}</span>
+            </div>
+            
+            <div class="flex items-start justify-between pb-4 border-b border-slate-100">
+                <span class="text-slate-600 font-medium">Status</span>
+                <span class="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-lg text-xs font-bold border border-yellow-100">
+                    {{ resep.status }}
+                </span>
+            </div>
+            
+            <div class="flex items-start justify-between pb-4 border-b border-slate-100">
+                <span class="text-slate-600 font-medium">Apoteker</span>
+                <span class="text-slate-800 font-semibold">{{ resep.apoteker.user.full_name|default:"Belum ditentukan" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informasi Pasien -->
+    <div class="bg-white rounded-xl border border-slate-100 p-6">
+        <h2 class="text-xl font-bold text-slate-800 mb-6">Pasien</h2>
+        
+        <div class="space-y-4">
+            <div class="pb-4 border-b border-slate-100">
+                <span class="text-slate-600 font-medium text-sm block mb-2">Nama Pasien</span>
+                <span class="text-slate-800 font-semibold block">{{ resep.rekam_medis.kunjungan.pasien.user.full_name }}</span>
+            </div>
+            
+            <div class="pb-4 border-b border-slate-100">
+                <span class="text-slate-600 font-medium text-sm block mb-2">No. RM</span>
+                <span class="text-slate-800 font-semibold block">{{ resep.rekam_medis.kunjungan.pasien.nomor_rekam_medis }}</span>
+            </div>
+            
+            <div>
+                <span class="text-slate-600 font-medium text-sm block mb-2">No. Identitas</span>
+                <span class="text-slate-800 font-semibold block">{{ resep.rekam_medis.kunjungan.pasien.nik }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detail Resep -->
+<div class="bg-white rounded-xl border border-slate-100 p-6">
+    <h2 class="text-xl font-bold text-slate-800 mb-6">Detail Obat-Obatan</h2>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+            <thead>
+                <tr class="text-slate-400 border-b border-slate-100">
+                    <th class="pb-4 font-semibold uppercase tracking-wider">Nama Obat</th>
+                    <th class="pb-4 font-semibold uppercase tracking-wider">Kode Obat</th>
+                    <th class="pb-4 font-semibold uppercase tracking-wider">Jumlah Diminta</th>
+                    <th class="pb-4 font-semibold uppercase tracking-wider">Dosis/Aturan</th>
+                    <th class="pb-4 font-semibold uppercase tracking-wider">Harga Satuan</th>
+                    <th class="pb-4 font-semibold uppercase tracking-wider text-right">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+                {% for detail in detail_resep %}
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                    <td class="py-4">
+                        <p class="font-semibold text-slate-700">{{ detail.obat.nama_obat }}</p>
+                    </td>
+                    <td class="py-4">
+                        <p class="font-semibold text-slate-700">{{ detail.obat.kode_obat }}</p>
+                    </td>
+                    <td class="py-4">
+                        <p class="font-semibold text-slate-700">{{ detail.jumlah_diminta }} {{ detail.obat.satuan }}</p>
+                    </td>
+                    <td class="py-4">
+                        <p class="font-semibold text-slate-700">{{ detail.dosis_aturan }}</p>
+                    </td>
+                    <td class="py-4">
+                        <p class="font-semibold text-slate-700">Rp {{ detail.obat.harga_jual|floatformat:0 }}</p>
+                    </td>
+                    <td class="py-4 text-right">
+                        <p class="font-semibold text-slate-700">Rp {{ detail.subtotal_harga|floatformat:0 }}</p>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="py-8 text-center text-slate-400 italic">Tidak ada data obat dalam resep ini.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Total Harga -->
+    <div class="mt-6 pt-6 border-t border-slate-100 flex justify-end">
+        <div class="w-64">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-slate-600 font-medium">Total Harga</span>
+                <span class="text-slate-800 font-bold text-lg">
+                    Rp {% widthratio total_harga 1 0 %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Hitung total harga jika ada detail resep
+    document.addEventListener("DOMContentLoaded", function() {
+        let total = 0;
+        const detailRows = document.querySelectorAll('tbody tr');
+        
+        detailRows.forEach(row => {
+            const subtotalCell = row.cells[5];
+            if (subtotalCell) {
+                const subtotal = parseFloat(subtotalCell.textContent.replace(/[^0-9.-]+/g, ''));
+                if (!isNaN(subtotal)) {
+                    total += subtotal;
+                }
+            }
+        });
+        
+        if (total > 0) {
+            const totalCell = document.querySelector('.text-lg');
+            if (totalCell) {
+                totalCell.textContent = 'Rp ' + total.toLocaleString('id-ID', { maximumFractionDigits: 0 });
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

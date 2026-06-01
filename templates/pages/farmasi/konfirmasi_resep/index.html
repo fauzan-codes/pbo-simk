@@ -1,0 +1,107 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+        {% include 'components/ui/breadcrumbs.html' %}  
+    </div>
+</div>
+
+<div class="overflow-x-auto">
+    <table id="resepTable" class="w-full text-sm text-left">
+        <thead>
+            <tr class="text-slate-400 border-b border-slate-100">
+                <th class="pb-4 font-semibold uppercase tracking-wider">ID Resep</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Pasien</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Apoteker</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Status</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Tanggal Resep</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider text-center">Aksi</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-50">
+            {% for resep in daftar_resep %}
+            <tr class="hover:bg-slate-50/50 transition-colors">
+                <td class="py-4">
+                    <p class="font-semibold text-slate-700">RS{{ resep.id }}</p>
+                </td>
+                <td class="py-4">
+                    <p class="font-semibold text-slate-700">{{ resep.rekam_medis.kunjungan.pasien.user.full_name }}</p>
+                </td>
+                <td class="py-4">
+                    <p class="font-semibold text-slate-700">{{ resep.apoteker.user.full_name |default:"Belum ditentukan" }}</p>
+                </td>
+                <td class="py-4">
+                    <span class="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-lg text-xs font-bold border border-yellow-100">
+                        {{ resep.status }}
+                    </span>
+                </td>
+                <td class="py-4">
+                    <p class="font-semibold text-slate-700">{{ resep.tanggal_resep|date:"d M Y H:i" }}</p>
+                </td>
+
+                <td class="py-4">
+                    <div class="flex justify-center items-center gap-2">
+                        <a title="Lihat Detail Resep" href="{% url 'konfirmasi_resep_detail' resep.id %}" class="p-2 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </a>
+                        <button title="Konfirmasi Resep" onClick="confirmResep('{{ resep.id }}')" class="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="py-8 text-center text-slate-400 italic">Belum ada resep yang perlu dikonfirmasi.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% block extra_js %}  
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dataTable = new simpleDatatables.DataTable("#resepTable", {
+                searchable: true,
+                perPage: 10,
+                labels: {
+                    placeholder: "Cari ID atau Nama Pasien",
+                    perPage: "data per halaman",
+                    noRows: "Data tidak ditemukan",
+                    info: "Menampilkan {start} sampai {end} dari {rows} data",
+                },
+                
+            });
+        });
+        
+        function confirmResep(id) {
+            Swal.fire({
+                title: 'Konfirmasi Resep?',
+                text: 'Resep ini akan ditandai sebagai selesai.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0284c7',
+                cancelButtonColor: '#ef4444', 
+                confirmButtonText: 'Ya, Konfirmasi!',
+                cancelButtonText: 'Batal',
+                border: 'none',
+                borderRadius: '1.5rem',
+                customClass: {
+                    popup: 'rounded-3xl',
+                    confirmButton: 'rounded-xl px-6 py-2.5',
+                    cancelButton: 'rounded-xl px-6 py-2.5'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = `/konfirmasi-resep/${id}/confirm`;
+                }
+            })
+        }
+    </script>
+{% endblock %}
+{% endblock %}

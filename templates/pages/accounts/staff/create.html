@@ -25,7 +25,7 @@
                     
                     {% include 'components/ui/input.html' with label="Email Kerja" type="email" name="email" placeholder="staff@klinik.com" required=True value=form.email.value|default:'' %}
                     
-                    {% include 'components/ui/input.html' with label="Password Sementara" type="password" name="password" required=True help_text="Minimal 8 karakter untuk keamanan." value=form.password.value|default:'' %}
+                    {% include 'components/ui/input.html' with label="Password" type="password" name="password" required=True help_text="Minimal 8 karakter untuk keamanan." value=form.password.value|default:'' %}
                 </div>
             </div>
 
@@ -44,7 +44,7 @@
                     </div>
                     
                     <div>
-                        {% include 'components/ui/input.html' with label="Jabatan" name="jabatan" placeholder="misal: Administrasi / Resepsionis" required=True value=form.jabatan.value|default:'' %}
+                        {% include 'components/ui/select.html' with label="Jabatan" name="jabatan" placeholder="-- Pilih Jabatan --" required=True options=jabatan_options selected_value=form.jabatan.value|default:'' %}
                     </div>
                     
                     <div>

@@ -1,16 +1,14 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from accounts import views as accounts_views
-from master_data import views as master_data_views
+from keuangan import views as keuangan_views
 from farmasi import views as farmasi_views
 from dashboard import views as dashboard_views
 from administrasi import views as administrasi_views
-from keuangan import views as keuangan_views
+from pelayanan import views as pelayanan_views
 
 urlpatterns = [
     # Account Route
-    path('generate-super-admin/', accounts_views.generate_superadmin, name='generate_super_admin'),
-
     path('admin/', admin.site.urls),
     path('', accounts_views.welcome_view,    name='welcome'),
     path('login/', accounts_views.login_view,    name='login'),
@@ -35,36 +33,17 @@ urlpatterns = [
     # Dashboard Route
     path('dashboard/', dashboard_views.dashboard_view, name='dashboard'),
 
-    # Master Data Route
-    path('metode-pembayaran/', master_data_views.metode_pembayaran_index, name="metode_pembayaran_index"),
-    path('metode-pembayaran/create', master_data_views.metode_pembayaran_create, name="metode_pembayaran_create"),
-    path('metode-pembayaran/<int:id>/edit', master_data_views.metode_pembayaran_edit, name="metode_pembayaran_edit"),
-    path('metode-pembayaran/<int:id>/delete', master_data_views.metode_pembayaran_delete, name="metode_pembarayan_delete"),
-
-    path('poli/', master_data_views.poli_index, name="poli_index"),
-    path('poli/create', master_data_views.poli_create, name="poli_create"),
-    path('poli/<int:id>/edit', master_data_views.poli_edit, name="poli_edit"),
-    path('poli/<int:id>/delete', master_data_views.poli_delete, name="poli_delete"),
-
-    path('tindakan/', master_data_views.tindakan_medis_index, name="tindakan_medis_index"),
-    path('tindakan/create', master_data_views.tindakan_medis_create, name="tindakan_medis_create"),
-    path('tindakan/<int:id>/edit', master_data_views.tindakan_medis_edit, name="tindakan_medis_edit"),
-    path('tindakan/<int:id>/delete', master_data_views.tindakan_medis_delete, name="tindakan_medis_delete"),
-
-    path('pelayanan/', include('pelayanan.urls')),
-
-    path('jadwal/', master_data_views.jadwal_praktik_index, name="jadwal_praktik_index"),
-    path('jadwal/create', master_data_views.jadwal_praktik_create, name="jadwal_praktik_create"),
-    path('jadwal/<int:id>/edit', master_data_views.jadwal_praktik_edit, name="jadwal_praktik_edit"),
-    path('jadwal/<int:id>/delete', master_data_views.jadwal_praktik_delete, name="jadwal_praktik_delete"),
-
-    # Farmasi Route
-    path('kategori-obat/', farmasi_views.kategori_obat_index, name="kategori_obat_index"),
-    path('kategori-obat/create', farmasi_views.kategori_obat_create, name="kategori_obat_create"),
-    path('kategori-obat/<int:id>/edit', farmasi_views.kategori_obat_edit, name="kategori_obat_edit"),
-    path('kategori-obat/<int:id>/delete', farmasi_views.kategori_obat_delete, name="kategori_obat_delete"),
-
     # Adiministrasi Route
+    path('poli/', administrasi_views.poli_index, name="poli_index"),
+    path('poli/create', administrasi_views.poli_create, name="poli_create"),
+    path('poli/<int:id>/edit', administrasi_views.poli_edit, name="poli_edit"),
+    path('poli/<int:id>/delete', administrasi_views.poli_delete, name="poli_delete"),
+
+    path('jadwal/', administrasi_views.jadwal_praktik_index, name="jadwal_praktik_index"),
+    path('jadwal/create', administrasi_views.jadwal_praktik_create, name="jadwal_praktik_create"),
+    path('jadwal/<int:id>/edit', administrasi_views.jadwal_praktik_edit, name="jadwal_praktik_edit"),
+    path('jadwal/<int:id>/delete', administrasi_views.jadwal_praktik_delete, name="jadwal_praktik_delete"),
+
     path('daftar-online/', administrasi_views.daftar_online_index, name="daftar_online_index"),
     path('tiket/<str:no_tiket>', administrasi_views.cetak_tiket, name="cetak_tiket"),
     
@@ -81,12 +60,42 @@ urlpatterns = [
     path('api/antrean/', administrasi_views.api_get_antrean, name="api_get_antrean"),
     path('api/antrean/panggil/', administrasi_views.api_panggil_pasien, name="api_panggil_pasien"),
     path('monitor/', administrasi_views.monitor_index, name="monitor_index"),
-
+    
     path('api/antrean/set_loket/', administrasi_views.api_set_loket, name='api_set_loket'),
 
-    # Keuangan
+    # Farmasi Route
+    path('kategori-obat/', farmasi_views.kategori_obat_index, name="kategori_obat_index"),
+    path('kategori-obat/create', farmasi_views.kategori_obat_create, name="kategori_obat_create"),
+    path('kategori-obat/<int:id>/edit', farmasi_views.kategori_obat_edit, name="kategori_obat_edit"),
+    path('kategori-obat/<int:id>/delete', farmasi_views.kategori_obat_delete, name="kategori_obat_delete"),
+
+    path('obat/', farmasi_views.stok_obat_index, name="stok_obat_index"),
+    path('obat/create', farmasi_views.stok_obat_create, name="stok_obat_create"),
+    path('stok-obat/<int:id>/edit/', farmasi_views.stok_obat_edit, name='stok_obat_edit'),
+    path('obat/<int:id>/delete', farmasi_views.stok_obat_delete, name="stok_obat_delete"),
+
+    path('konfirmasi-resep/', farmasi_views.konfirmasi_resep_index, name="konfirmasi_resep_index"),
+    path('konfirmasi-resep/<int:id>/detail', farmasi_views.konfirmasi_resep_detail, name="konfirmasi_resep_detail"),
+    path('konfirmasi-resep/<int:id>/confirm', farmasi_views.konfirmasi_resep_confirm, name="konfirmasi_resep_confirm"),
+    
+    # Pelayanan Route
+    path('tindakan/', pelayanan_views.tindakan_medis_index, name="tindakan_medis_index"),
+    path('tindakan/create', pelayanan_views.tindakan_medis_create, name="tindakan_medis_create"),
+    path('tindakan/<int:id>/edit', pelayanan_views.tindakan_medis_edit, name="tindakan_medis_edit"),
+    path('tindakan/<int:id>/delete', pelayanan_views.tindakan_medis_delete, name="tindakan_medis_delete"),
+
+    path('rawat-pasien/', pelayanan_views.rawat_pasien_detail, name='rawat_pasien_index'),
+    path('rawat-pasien/<int:kunjungan_id>/', pelayanan_views.rawat_pasien_detail, name='rawat_pasien_detail'),
+    path('resep-obat/', pelayanan_views.resep_obat_index, name='resep_obat_index'),
+    path('resep-obat/<int:kunjungan_id>/', pelayanan_views.resep_obat_index, name='resep_obat_detail'),      
+
+    # Keuangan Route
+    path('metode-pembayaran/', keuangan_views.metode_pembayaran_index, name="metode_pembayaran_index"),
+    path('metode-pembayaran/create', keuangan_views.metode_pembayaran_create, name="metode_pembayaran_create"),
+    path('metode-pembayaran/<int:id>/edit', keuangan_views.metode_pembayaran_edit, name="metode_pembayaran_edit"),
+    path('metode-pembayaran/<int:id>/delete', keuangan_views.metode_pembayaran_delete, name="metode_pembarayan_delete"),
+
     path('tagihan-pasien/', keuangan_views.keuangan_tagihan_index, name='keuangan_tagihan_index'),
     path('tagihan-pasien/buat-tagihan/<int:id>', keuangan_views.buat_tagihan_index, name='buat_tagihan_index'),
     path('riwayat-pembayaran/', keuangan_views.keuangan_riwayat_index, name='keuangan_riwayat_index'),
-    
 ]

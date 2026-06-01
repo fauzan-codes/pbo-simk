@@ -1,0 +1,7 @@
+*pelayanan
+->dokter harusnya bisa finalisasi resep tanpa minimal obat (bisa kosong)
+->dikeranjang obat kasih input dosisi/aturan pakai
+->riwayat pelayanan
+
+*farmasi
+->riwayat resep

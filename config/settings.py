@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'dashboard',
     'administrasi',
     'accounts',
-    'master_data',
     'pelayanan',
     'farmasi',
     'keuangan',

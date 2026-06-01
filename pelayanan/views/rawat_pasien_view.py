@@ -1,9 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from pelayanan.models import Kunjungan, RekamMedis, TindakanRekamMedis
-from master_data.models import TindakanMedis
-
+from pelayanan.models import Kunjungan, RekamMedis, TindakanRekamMedis, TindakanMedis
 
 @login_required
 def rawat_pasien_detail(request, kunjungan_id=None):
@@ -205,3 +203,4 @@ def rawat_pasien_detail(request, kunjungan_id=None):
         'pages/pelayanan/rawat_pasien/index.html',
         context
     )
+

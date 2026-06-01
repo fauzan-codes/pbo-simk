@@ -38,7 +38,12 @@ def staff_create(request):
             {'name': 'Manajemen Staff', 'url': reverse('staff_index')},
             {'name': 'Registrasi Staff', 'url': None},
         ],
-        'page_title': 'Tambah Staff Baru'
+        'page_title': 'Tambah Staff Baru',
+        'jabatan_options' : [
+            ('Administrasi', 'Administrasi'),
+            ('Kasir', 'Kasir'),
+            ('Apoteker', 'Apoteker'),
+        ]
     }
     return render(request, 'pages/accounts/staff/create.html', context)
 
@@ -82,6 +87,11 @@ def staff_edit(request, id):
             {'name': 'Manajemen staff', 'url': reverse('staff_index')},
             {'name': 'Edit staff', 'url': None},
         ],
+        'jabatan_options' : [
+            ('Administrasi', 'Administrasi'),
+            ('Kasir', 'Kasir'),
+            ('Apoteker', 'Apoteker'),
+        ]
     }
     return render(request, 'pages/accounts/staff/edit.html', context)
 

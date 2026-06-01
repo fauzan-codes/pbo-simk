@@ -4,8 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from pelayanan.models import Kunjungan
 from accounts.models import Pasien
-from master_data.models import JadwalPraktik
-from administrasi.models import Tiket
+from administrasi.models import Tiket, JadwalPraktik
 from django.urls import reverse
 
 def get_jadwal():
@@ -15,8 +14,12 @@ def get_jadwal():
         hari_key = j.hari.lower() 
         if hari_key not in jadwal_dict:
             jadwal_dict[hari_key] = []
+
+        nama_poli = j.poli.nama_poli
+        if "poli" not in nama_poli.lower():
+            nama_poli = "Poli " + nama_poli
             
-        label = f"{j.dokter.user.full_name} - Poli {j.poli.nama_poli} ({j.jam_mulai.strftime('%H:%M')} - {j.jam_selesai.strftime('%H:%M')})"
+        label = f" {nama_poli} ({j.jam_mulai.strftime('%H:%M')} - {j.jam_selesai.strftime('%H:%M')}) | {j.dokter.get_identitas()}"
         
         jadwal_dict[hari_key].append({
             'value': j.id,
@@ -91,10 +94,18 @@ def check_in_offline(request):
             pasien_id = pasien_id,
             tanggal_kunjungan = tanggal_kunjungan,
             jadwal_id = jadwal_id,
-            nomor_antrean=nomor_baru
+            nomor_antrean=nomor_baru,
+            status="menunggu"
         )
 
         messages.success(request, f'Berhasil mendaftarkan pasien dengan nomor antrean {kunjungan.kode_antrean}')
+
+        request.session['tiket_baru'] = {
+            'kode_antrean': kunjungan.kode_antrean,
+            'nama_pasien': kunjungan.pasien.user.full_name, 
+            'poli': jadwal.poli.nama_poli,
+            'tanggal': tanggal_kunjungan
+        }
 
         return redirect('check_in_offline')
 
@@ -102,10 +113,7 @@ def check_in_offline(request):
     
     pasien_options = []
     for pasien in semua_pasien:
-        nama_lengkap = pasien.user.full_name if pasien.user else "Tanpa Nama"
-        
-        label = f"{pasien.nomor_rekam_medis} - {nama_lengkap}"
-        
+        label = pasien.get_identitas()
         pasien_options.append((pasien.id, label))
 
     context = {
@@ -118,5 +126,7 @@ def check_in_offline(request):
         'jadwal_data_json': get_jadwal(),
     }
 
+    if 'tiket_baru' in request.session:
+        context['tiket_baru'] = request.session.pop('tiket_baru')
 
     return render(request, 'pages/administrasi/check_in/offline.html', context)

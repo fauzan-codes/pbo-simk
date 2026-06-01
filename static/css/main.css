@@ -1,7 +1,6 @@
 /* ============================================================
    CUSTOM SIMPLE-DATATABLES STYLE (TAILWIND LOOK-ALIKE)
    ============================================================ */
-
 .datatable-container {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch;

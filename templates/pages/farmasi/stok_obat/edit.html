@@ -1,0 +1,44 @@
+{% extends 'layouts/main.html' %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
+    {% include 'components/ui/breadcrumbs.html' %}
+</div>
+
+<div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
+    <form method="POST" class="flex flex-col">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-6 gap-x-6 gap-y-4">
+            
+            <div class="md:col-span-3 col-span-6 flex flex-col gap-y-4">
+                {% include 'components/ui/input.html' with label="Input Nama" name="nama_obat" type="text" placeholder="Masukkan nama obat" value=obat.nama_obat required=True %}
+                
+                {% include 'components/ui/select.html' with label="Kategori Obat" name="kategori" placeholder="-- Select Kategori dari tabel kategori_obat --" required=True options=kategori_options selected_value=obat.kategori_id %}
+                
+                {% include 'components/ui/input.html' with label="Input Stock" name="stok" type="number" placeholder="Masukkan jumlah stok" value=obat.stok required=True %}
+            </div>
+            
+            <div class="md:col-span-3 col-span-6 flex flex-col gap-y-4">
+                {% include 'components/ui/input.html' with label="Input Kode Obat" name="kode_obat" type="text" placeholder="Masukkan kode obat" value=obat.kode_obat required=True %}
+                
+                {% include 'components/ui/input.html' with label="Input Satuan" name="satuan" type="text" placeholder="Contoh: Tablet, Botol, Pcs" value=obat.satuan required=True %}
+                
+                {% include 'components/ui/input.html' with label="Input Harga Jual" name="harga" type="number" placeholder="Masukkan harga jual" value=obat.harga_jual required=True %}
+            </div>
+
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-slate-100">
+            <a href="{% url 'stok_obat_index' %}" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">
+                Batal
+            </a>
+
+            {% include 'components/ui/button.html' with label="Update" type="submit" variant="primary" %}
+        </div>
+    </form>
+</div>
+{% endblock %}

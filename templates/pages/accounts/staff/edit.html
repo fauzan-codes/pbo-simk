@@ -45,7 +45,7 @@
                     </div>
                     
                     <div>
-                        {% include 'components/ui/input.html' with label="Jabatan" name="jabatan" placeholder="misal: Administrasi / Resepsionis" required=True value=form.initial.jabatan %}
+                        {% include 'components/ui/select.html' with label="Jabatan" name="jabatan" placeholder="-- Pilih Jabatan --" required=True options=jabatan_options selected_value=form.jabatan.value|default:'' selected_value=form.initial.jabatan %}
                     </div>
                     
                     <div>

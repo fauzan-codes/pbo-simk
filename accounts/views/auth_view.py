@@ -26,14 +26,7 @@ def login_view(request):
         else:
             messages.error(request, 'Username atau password salah.')
 
-    return render(request, 'pages/auth/login.html', {
-        'left_features': [
-            'Rekam medis elektronik terintegrasi',
-            'Manajemen stok obat & farmasi',
-            'Laporan keuangan real-time',
-            'Penjadwalan dokter & antrian pasien',
-        ]
-    })
+    return render(request, 'pages/accounts/auth/login.html')
 
 def register_view(request): 
     if request.user.is_authenticated:
@@ -101,36 +94,13 @@ def register_view(request):
 
     form = PasienForm(request.POST or None)
     context = {
-        'left_features': [
-            'Akses modul sesuai role pengguna',
-            'Data tersimpan aman & terenkripsi',
-            'Notifikasi real-time untuk staf',
-            'Riwayat aktivitas tercatat otomatis',
-        ],
         'jenis_kelamin_options': jenis_kelamin_options,
         'form' : form
     }
 
-    return render(request, 'pages/auth/register.html', context)
+    return render(request, 'pages/accounts/auth/register.html', context)
 
 def logout_view(request):
     logout(request)
     messages.success(request, 'Anda berhasil keluar.')
     return redirect('login')
-
-def generate_superadmin(request):
-    checkSuperadmin = User.objects.filter(role="admin")
-
-    if checkSuperadmin:
-        messages.error(request, "Akun superadmin sudah ada")
-    else:
-        User.objects.create_superuser(
-            full_name = "Administrator SIMK",
-            username = "superadmin",
-            email = "admin@gmail.com",
-            password = "password",
-            role = "admin"
-        )
-        messages.success(request, "Akun superadmin berhasil dibuat")
-    return redirect('login')
-

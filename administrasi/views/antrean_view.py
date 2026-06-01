@@ -5,8 +5,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from pelayanan.models import Kunjungan
-from administrasi.models import Loket
-from master_data.models import JadwalPraktik
+from administrasi.models import Loket, JadwalPraktik
 
 def antrean_index(request):
     mqtt_url = os.environ.get('MQTT_WEBSOCKET_URL', 'ws://localhost:9001/mqtt')

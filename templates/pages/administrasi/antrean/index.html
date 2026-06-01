@@ -74,7 +74,6 @@
 {% block extra_js %}
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
-    // State Global
     let activeLoketId = '{{ request.session.active_loket_id|default:"" }}'; 
     let activeLoketName = '';
 
@@ -125,7 +124,6 @@
             .then(data => {
                 window.loketList = data.loket;
                 
-                // Cari nama loket jika staff sudah punya activeLoketId
                 if (activeLoketId) {
                     const foundLoket = data.loket.find(l => l.id == activeLoketId);
                     if (foundLoket) activeLoketName = foundLoket.nama_loket;
@@ -140,12 +138,10 @@
             });
     }
 
-    // --- FUNGSI BARU: RENDER PANEL KONTROL LOKET ---
     function renderLoketControl() {
         const panel = document.getElementById('loketControlPanel');
         
         if (activeLoketId) {
-            // STATE: SUDAH PILIH LOKET
             panel.innerHTML = `
                 <div class="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold text-sm border border-green-200">
                     <span class="font-normal text-green-600 mr-1">Bertugas di:</span> ${activeLoketName}
@@ -155,7 +151,6 @@
                 </button>
             `;
         } else {
-            // STATE: BELUM PILIH LOKET
             const options = window.loketList ? window.loketList.map(l => `<option value="${l.id}">${l.nama_loket}</option>`).join('') : '';
             panel.innerHTML = `
                 <select id="selectLoketTugas" class="px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white min-w-[150px]">
@@ -169,13 +164,16 @@
         }
     }
 
-    // --- FUNGSI BARU: SIMPAN & LEPASKAN LOKET ---
     function saveLoket() {
         const select = document.getElementById('selectLoketTugas');
         const loketId = select.value;
-        if (!loketId) return alert('Silakan pilih loket terlebih dahulu!');
+        if (!loketId) {
+            return Swal.fire({
+                icon: 'warning',
+                text: 'Silakan pilih loket terlebih dahulu!',
+            });
+        }
 
-        // Panggil API untuk update tabel Loket (isi staff_id)
         fetch('/api/antrean/set_loket/', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -185,9 +183,13 @@
         .then(data => {
             if (data.status === 'success') {
                 activeLoketId = loketId;
-                fetchAntrean(); // Refresh UI & Trigger MQTT dari backend
+                fetchAntrean(); 
             } else {
-                alert('Gagal: ' + data.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Memulai Tugas',
+                    text: data.message,
+                });
             }
         });
     }
@@ -195,7 +197,6 @@
     function releaseLoket() {
         if (!confirm('Akhiri tugas di loket ini?')) return;
 
-        // Panggil API untuk update tabel Loket (kosongkan staff_id)
         fetch('/api/antrean/set_loket/', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -212,9 +213,13 @@
     }
 
     function callPatient(kunjunganId) {
-        // Validasi utama: Apakah staff sudah memilih loket?
         if (!activeLoketId) {
-            alert('Anda harus Memilih dan Memulai Tugas di sebuah loket terlebih dahulu!');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Loket Belum Dipilih',
+                text: 'Anda harus memilih dan memulai tugas di sebuah loket terlebih dahulu!',
+                confirmButtonColor: '#0ea5e9'
+            });
             return;
         }
 
@@ -228,13 +233,20 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 kunjungan_id: kunjunganId,
-                loket_id: activeLoketId // Gunakan loket aktif, bukan dari row
+                loket_id: activeLoketId 
             })
         })
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') fetchAntrean(); 
-            else alert('Error: ' + data.message);
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Memanggil',
+                    text: data.message,
+                });
+            }
+
         })
         .finally(() => {
             btn.textContent = originalText;
@@ -250,7 +262,6 @@
         }
 
         list.innerHTML = antrean.map(item => {
-            // Disable tombol panggil jika staff belum pilih loket
             const btnClass = activeLoketId 
                 ? "bg-sky-500 hover:bg-sky-600 text-white" 
                 : "bg-slate-200 text-slate-400 cursor-not-allowed";

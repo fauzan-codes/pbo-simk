@@ -20,8 +20,9 @@
             <tr class="text-slate-400 border-b border-slate-100">
                 <th class="pb-4 font-semibold uppercase tracking-wider">Nama & NIK</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider">No. Rekam Medis</th>
-                <th class="pb-4 font-semibold uppercase tracking-wider">Kontak</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider">Jenis Kelamin</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Kontak</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Email</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider text-center">Aksi</th>
             </tr>
         </thead>
@@ -41,10 +42,6 @@
                         {{ user.pasien_profile.nomor_rekam_medis }}
                     </span>
                 </td>
-                <td class="py-4 text-slate-600">
-                    <p class="text-xs">{{ user.pasien_profile.no_hp }}</p>
-                    <p class="text-[10px] text-slate-400 truncate max-w-[150px]">{{ user.pasien_profile.alamat }}</p>
-                </td>
                 <td class="py-4">
                     {% if user.pasien_profile.jenis_kelamin == 'L' %}
                     <span class="text-slate-600 flex items-center gap-1">
@@ -55,6 +52,15 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span> Perempuan
                     </span>
                     {% endif %}
+                </td>
+                <td class="py-4 text-slate-600">
+                    <p class="text-xs">{{ user.pasien_profile.no_hp }}</p>
+                    <p class="text-[10px] text-slate-400 truncate max-w-[150px]">{{ user.pasien_profile.alamat }}</p>
+                </td>
+                <td class="px-6 py-4 text-slate-500">
+                    <a href="mailto:{{ user.email }}" class="text-blue-500 hover:underline">
+                        {{ user.email }}
+                    </a>
                 </td>
                 <td class="py-4">
                     <div class="flex justify-center items-center gap-2">
@@ -69,7 +75,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="py-8 text-center text-slate-400 italic">Belum ada data pasien.</td>
+                <td colspan="6" class="py-8 text-center text-slate-400 italic">Belum ada data pasien.</td>
             </tr>
             {% endfor %}
         </tbody>

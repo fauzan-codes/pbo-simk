@@ -1,0 +1,21 @@
+{% extends 'layouts/auth.html' %}
+{% block title %}Login - SIMK{% endblock %}
+
+{% block auth_content %}
+    <div class="mb-8">
+    <h2 class="text-2xl font-semibold text-slate-900 tracking-tight">Selamat datang</h2>
+    <p class="text-slate-500 text-sm mt-1">Masuk ke akun SIMK Anda untuk melanjutkan</p>
+    </div>
+
+<form method="POST">
+    {% csrf_token %}
+    {% include "components/ui/input.html" with label="Username" name="username" type="text" placeholder="Masukkan username" required=True %}
+    {% include "components/ui/input.html" with label="Password" name="password" type="password" placeholder="Masukkan password" required=True %}
+
+    {% include "components/ui/button.html" with label="Masuk ke SIMK" type="submit" variant="primary" class="w-full justify-center mt-6" %}
+</form>
+
+<p class="text-center text-xs text-slate-500 mt-6">
+    Belum punya akun? <a href="{% url 'register' %}" class="text-sky-500 font-medium hover:underline">Daftar sekarang</a>
+</p>
+{% endblock %}

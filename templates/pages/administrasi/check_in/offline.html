@@ -36,6 +36,62 @@
         </div>
     </form>
 </div>
+
+{% if tiket_baru %}
+<div id="modalTiket" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 transition-opacity">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-100 transition-transform">
+        
+        <div class="bg-blue-600 p-6 text-center text-white">
+            <h4 class="text-sm font-bold uppercase tracking-widest text-blue-200 mb-1">Klinik Dewayani</h4>
+            <h3 class="text-xl font-bold">Tiket Antrean</h3>
+        </div>
+
+        <div id="areaCetak" class="p-8 text-center bg-white">
+            <p class="text-slate-500 text-sm font-medium mb-1">{{ tiket_baru.poli }}</p>
+            <h2 class="text-6xl font-black text-slate-800 mb-4 tracking-tighter">{{ tiket_baru.kode_antrean }}</h2>
+            
+            <div class="border-t border-dashed border-slate-300 py-4 mt-4">
+                <p class="text-slate-800 font-bold text-lg mb-1">{{ tiket_baru.nama_pasien }}</p>
+                <p class="text-slate-500 text-sm">Tanggal: {{ tiket_baru.tanggal }}</p>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">Silakan menunggu panggilan di ruang tunggu.</p>
+        </div>
+
+        <div class="p-4 bg-slate-50 flex gap-3 border-t border-slate-100">
+            <button onclick="closeModal()" class="flex-1 px-4 py-2.5 rounded-xl text-slate-600 font-semibold bg-white border border-slate-200 hover:bg-slate-50 transition-colors">
+                Tutup
+            </button>
+            <button onclick="cetakTiket()" class="flex-1 px-4 py-2.5 rounded-xl text-white font-semibold bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm flex justify-center items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                Cetak
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function closeModal() {
+        document.getElementById('modalTiket').style.display = 'none';
+    }
+
+    function cetakTiket() {
+        const areaCetak = document.getElementById('areaCetak').innerHTML;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Cetak Tiket</title>');
+        printWindow.document.write('<script src="https://cdn.tailwindcss.com"><\/script>'); // Load tailwind agar styling print sesuai
+        printWindow.document.write('</head><body class="flex items-center justify-center min-h-screen">');
+        printWindow.document.write('<div class="w-80 border-2 border-slate-800 p-6 text-center">' + areaCetak + '</div>');
+        printWindow.document.write('</body></html>');
+        
+        printWindow.document.close();
+        setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+        }, 500);
+    }
+</script>
+{% endif %}
+
 {% endblock %}
 
 {% block extra_js %} 

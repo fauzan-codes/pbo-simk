@@ -7,10 +7,19 @@
     
     <div class="flex justify-between items-center bg-white rounded-full border border-slate-200 px-6 py-3 shadow-sm">
         <h1 class="text-lg font-bold text-slate-800 tracking-wide uppercase">Layar Antrean Poliklinik</h1>
-        <span id="connectionStatus" class="inline-flex items-center gap-2 text-sm font-semibold">
-            <span class="inline-block w-2.5 h-2.5 bg-yellow-500 rounded-full animate-pulse"></span>
-            <span class="text-yellow-600">Menghubungkan ke Server...</span>
-        </span>
+        
+        <div class="flex items-center gap-4">
+            <span id="connectionStatus" class="inline-flex items-center gap-2 text-sm font-semibold">
+                <span class="inline-block w-2.5 h-2.5 bg-yellow-500 rounded-full animate-pulse"></span>
+                <span class="text-yellow-600">Menghubungkan ke Server...</span>
+            </span>
+            
+            <button onclick="toggleFullScreen()" class="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors" title="Layar Penuh">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <div class="bg-linear-to-br from-blue-600 to-sky-500 rounded-3xl shadow-lg overflow-hidden relative border border-blue-400">
@@ -51,6 +60,31 @@
 <script>
     const bellSound = new Audio('https://actions.google.com/sounds/v1/alarms/doorbell.ogg'); 
     
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error saat mencoba fullscreen: ${err.message}`);
+            });
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+            const sidebar = document.getElementById('main-sidebar');
+            const mainContent = document.getElementById('main-content');
+
+            if (document.fullscreenElement) {
+                if (sidebar) sidebar.style.display = 'none';
+                if (mainContent) mainContent.classList.remove('lg:ml-64');
+            } else {
+                if (sidebar) sidebar.style.display = '';
+                if (mainContent) mainContent.classList.add('lg:ml-64');
+            }
+        });
+
     function updateConnectionStatus(status) {
         const statusEl = document.getElementById('connectionStatus');
         if (status === 'error' || status === 'offline') {
@@ -156,7 +190,6 @@
 
             return `
                 <div class="${bgClass} border ${borderClass} rounded-2xl p-6 flex flex-col items-center justify-center text-center transition-all h-48 relative overflow-hidden group">
-                    <!-- Strip warna di atas box -->
                     <div class="absolute top-0 left-0 right-0 h-1.5 ${isAktif && !isKosong ? 'bg-blue-500' : (isAktif ? 'bg-green-400' : 'bg-slate-300')}"></div>
                     
                     <div class="flex items-center justify-between w-full mb-4">

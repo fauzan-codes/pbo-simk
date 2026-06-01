@@ -3,8 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from pelayanan.models import Kunjungan
-from accounts.models import Pasien
-from master_data.models import JadwalPraktik
+from administrasi.models import JadwalPraktik
 from administrasi.models import Tiket
 from django.urls import reverse
 
@@ -16,7 +15,11 @@ def get_jadwal():
         if hari_key not in jadwal_dict:
             jadwal_dict[hari_key] = []
             
-        label = f"{j.dokter.user.full_name} - Poli {j.poli.nama_poli} ({j.jam_mulai.strftime('%H:%M')} - {j.jam_selesai.strftime('%H:%M')})"
+        nama_poli = j.poli.nama_poli
+        if "poli" not in nama_poli.lower():
+            nama_poli = "Poli " + nama_poli
+            
+        label = f" {nama_poli} ({j.jam_mulai.strftime('%H:%M')} - {j.jam_selesai.strftime('%H:%M')}) | {j.dokter.get_identitas()}"
         
         jadwal_dict[hari_key].append({
             'value': j.id,

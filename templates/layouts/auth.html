@@ -1,62 +1,39 @@
 {% extends 'layouts/app.html' %}
+{% load static %}
+
 {% block layout_content %}
 
 <div class="min-h-screen flex">
 
-  <div class="hidden lg:flex w-[45%] min-h-screen flex-col justify-between p-12 relative overflow-hidden"
-      style="background: linear-gradient(160deg, #0c2d48 0%, #0f4c75 40%, #0ea5e9 100%)">
+  <div class="hidden lg:flex w-[45%] min-h-screen flex-col justify-between p-12 relative overflow-hidden bg-cover bg-center"
+       style="background-image: url('{% static 'img/auth.webp' %}');">
+    
+    <div class="absolute inset-0 z-0 opacity-80"
+         style="background: linear-gradient(160deg, #0c2d48 0%, #0f4c75 40%, #0ea5e9 100%)">
+    </div>
 
-    <div class="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/4"></div>
-    <div class="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-white/5"></div>
+    <div class="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/10 z-10"></div>
+    <div class="absolute -bottom-16 -left-16 w-72 h-72 rounded-full bg-white/10 z-10"></div>
 
-    <div class="relative z-10 flex items-center gap-3">
-      <div class="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center">
-        <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
-          <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3v5h5v2h-5v5h-2v-5H5v-2h5V6h2z"/>
-        </svg>
+    <div class="relative z-20 flex items-center gap-3">
+      <div class="w-11 h-11 rounded-xl bg-white/90 border border-white/20 flex items-center justify-center backdrop-blur-sm p-0.5">
+        <img src="{% static 'img/logo.webp' %}" alt="Logo SIMK" class="w-full h-full object-contain">
       </div>
       <div>
         <p class="text-white font-semibold text-lg leading-none">SIMK</p>
-        <p class="text-white/50 text-[11px] tracking-widest uppercase mt-0.5">Sistem Informasi Manajemen Klinik</p>
+        <p class="text-white/70 text-[11px] tracking-widest uppercase mt-0.5">Sistem Informasi Manajemen Klinik</p>
       </div>
     </div>
-
-    <div class="relative z-10">
-      <div class="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-3 py-1 text-xs text-white/80 mb-6">
-        <span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-        {% block left_tag %}Sistem aktif & terbarukan{% endblock %}
-      </div>
-      <h1 class="text-[2.4rem] text-white font-light leading-tight mb-4">
-        {% block left_title %}Kelola klinik Anda<br><span class="font-semibold">dengan mudah</span>{% endblock %}
-      </h1>
-      <p class="text-white/60 text-sm leading-relaxed max-w-sm">
-        {% block left_desc %}Platform manajemen klinik terintegrasi — pasien, rekam medis, farmasi, dan laporan dalam satu dasbor.{% endblock %}
-      </p>
-    </div>
-
-    <div class="relative z-10 space-y-3">
-      {% block left_features %}
-      {% for item in left_features %}
-      <div class="flex items-center gap-2.5 text-xs text-white/70">
-        <span class="w-5 h-5 rounded-full bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-          <span class="w-1.5 h-1.5 rounded-full bg-sky-300"></span>
-        </span>
-        {{ item }}
-      </div>
-      {% endfor %}
-      {% endblock %}
-    </div>
-
+    
+    <div class="relative z-20"></div>
   </div>
 
   <div class="flex-1 flex items-center justify-center px-6 py-12 bg-white">
     <div class="w-full max-w-sm">
 
       <div class="flex items-center gap-2 mb-6 lg:hidden">
-        <div class="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center">
-          <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24">
-            <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3v5h5v2h-5v5h-2v-5H5v-2h5V6h2z"/>
-          </svg>
+        <div class="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center p-1.5">
+          <img src="{% static 'img/logo.webp' %}" alt="Logo SIMK" class="w-full h-full object-contain">
         </div>
         <p class="font-semibold text-slate-800">SIMK</p>
       </div>

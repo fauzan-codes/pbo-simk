@@ -22,6 +22,7 @@
                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">Nama Staff & Username</th>
                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">Jabatan</th>
                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">Shift Kerja</th>
+                    <th class="px-6 py-4 font-semibold uppercase tracking-wider">Kontak</th>
                     <th class="px-6 py-4 font-semibold uppercase tracking-wider">Email</th>
                     <th class="px-6 py-4 font-semibold uppercase tracking-wider text-center">Aksi</th>
                 </tr>
@@ -50,8 +51,14 @@
                             <span class="text-xs">{{ user.staff_profile.shift_kerja }}</span>
                         </div>
                     </td>
+                    <td class="py-4 text-slate-600">
+                        <p class="text-xs">{{ user.staff_profile.no_hp }}</p>
+                        <p class="text-[10px] text-slate-400 truncate max-w-[150px]">{{ user.staff_profile.alamat }}</p>
+                    </td>
                     <td class="px-6 py-4 text-slate-500">
-                        {{ user.email }}
+                        <a href="mailto:{{ user.email }}" class="text-blue-500 hover:underline">
+                            {{ user.email }}
+                        </a>
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex justify-center items-center gap-2">
@@ -66,7 +73,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="py-12 text-center text-slate-400 italic">Belum ada data staff terdaftar.</td>
+                    <td colspan="6" class="py-12 text-center text-slate-400 italic">Belum ada data staff terdaftar.</td>
                 </tr>
                 {% endfor %}
             </tbody>

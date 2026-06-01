@@ -25,7 +25,7 @@
                     
                     {% include 'components/ui/input.html' with label="Email" type="email" name="email" placeholder="budi@email.com" required=True value=form.email.value|default:'' %}
                     
-                    {% include 'components/ui/input.html' with label="Password Sementara" type="password" name="password" required=True help_text="Gunakan minimal 8 karakter campuran."  value=form.password.value|default:'' %}
+                    {% include 'components/ui/input.html' with label="Password" type="password" name="password" required=True help_text="Gunakan minimal 8 karakter campuran."  value=form.password.value|default:'' %}
                 </div>
             </div>
         </div>
