@@ -2,10 +2,7 @@
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block dashboard_content %}
 <div class="mb-8">
-    <h1 class="text-2xl font-bold text-slate-800 mb-3">
-        {{ page_title }}
-    </h1>
-
+    <h1 class="text-2xl font-bold text-slate-800 mb-3">{{ page_title }}</h1>
     {% include 'components/ui/breadcrumbs.html' %}
 </div>
 
@@ -198,11 +195,11 @@
                                     </p>
                                 </td>
 
-                                <td class="py-4">
+                                {% comment %} <td class="py-4">
                                     <p class="font-semibold text-slate-700">
                                         {{ obat.kategori_id }}
                                     </p>
-                                </td>
+                                </td> {% endcomment %}
 
                                 <td class="py-4">
                                     {% if obat.stok > 10 %}
@@ -245,7 +242,7 @@
 
         <div class="xl:col-span-4">
             <div class="bg-white rounded-3xl border border-slate-100 shadow-sm sticky top-8 overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-gradient-to-r from-sky-50 to-white">
+                <div class="p-6 border-b border-slate-100 to-white">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <h3 class="text-lg font-bold text-slate-800 mb-1">
@@ -340,7 +337,6 @@
                 if (item.checked) {
                     selectedObat.push(item.value);
                 }
-
             });
 
             localStorage.setItem(
