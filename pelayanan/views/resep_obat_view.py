@@ -103,21 +103,27 @@ def resep_obat_index(request, kunjungan_id=None):
         selected_items = []
 
         for obat_id in obat_ids:
+            dosis_aturan = request.POST.get(
+                f'dosis_aturan_{obat_id}',
+                '-'
+            )
+
             selected_items.append({
                 'obat_id': obat_id,
-                'jumlah': 1
+                'jumlah': 1,
+                'dosis_aturan': dosis_aturan
             })
 
-        if len(selected_items) < 1:
-            messages.error(
-                request,
-                'Minimal pilih 1 obat.'
-            )
+        # if len(selected_items) < 1:
+        #     messages.error(
+        #         request,
+        #         'Minimal pilih 1 obat.'
+        #     )
 
-            return redirect(
-                'resep_obat_detail',
-                kunjungan_id=kunjungan.id
-            )
+        #     return redirect(
+        #         'resep_obat_detail',
+        #         kunjungan_id=kunjungan.id
+        #     )
 
         DetailResep.objects.filter(
             resep=resep
@@ -132,7 +138,7 @@ def resep_obat_index(request, kunjungan_id=None):
                 resep=resep,
                 obat=obat,
                 jumlah_diminta=item['jumlah'],
-                dosis_aturan='-',
+                dosis_aturan=item['dosis_aturan'],
                 subtotal_harga=(
                     int(item['jumlah']) * obat.harga_jual
                 )
