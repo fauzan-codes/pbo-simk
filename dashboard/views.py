@@ -26,8 +26,8 @@ def dashboard_view(request):
         role_detail = getattr(user, 'pasien_profile', None)
         quick_links = [
             {'title': 'Buat Janji Temu', 'desc': 'Daftar Online', 'url': reverse('daftar_online_index'), 'color': 'text-blue-600 bg-blue-100'},
-            {'title': 'Riwayat Medis', 'desc': 'Lihat hasil periksa', 'url': '#', 'color': 'text-emerald-600 bg-emerald-100'},
-            {'title': 'Tagihan', 'desc': 'Status pembayaran', 'url': '#', 'color': 'text-amber-600 bg-amber-100'},
+            # {'title': 'Riwayat Medis', 'desc': 'Lihat hasil periksa', 'url': '#', 'color': 'text-emerald-600 bg-emerald-100'},
+            # {'title': 'Tagihan', 'desc': 'Status pembayaran', 'url': '#', 'color': 'text-amber-600 bg-amber-100'},
         ]
     
     elif user.role == 'dokter':
@@ -41,7 +41,7 @@ def dashboard_view(request):
         role_detail = getattr(user, 'staff_profile', None) 
         quick_links = [
             {'title': 'Modul Administrasi', 'desc': 'Pendaftaran pasien', 'url': reverse('check_in_index'), 'color': 'text-rose-600 bg-rose-100'},
-            {'title': 'Modul Kasir', 'desc': 'Kelola pembayaran', 'url': '#', 'color': 'text-green-600 bg-green-100'},
+            {'title': 'Modul Kasir', 'desc': 'Kelola pembayaran', 'url': reverse('keuangan_tagihan_index'), 'color': 'text-green-600 bg-green-100'},
             {'title': 'Modul Apoteker', 'desc': 'Kelola stok obat', 'url': reverse('stok_obat_index'), 'color': 'text-cyan-600 bg-cyan-100'},
         ]
 
@@ -55,7 +55,10 @@ def dashboard_view(request):
     }
 
     if user.role == "pasien":
-        context['list_tiket'] = Tiket.objects.filter(pasien=user.pasien_profile)
+        context['list_tiket'] = Tiket.objects.filter(
+            pasien=user.pasien_profile, 
+            kunjungan__status="dipesan"
+        )
 
     return render(request, 'pages/dashboard/index.html', context)
 

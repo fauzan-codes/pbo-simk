@@ -98,4 +98,5 @@ urlpatterns = [
     path('tagihan-pasien/', keuangan_views.keuangan_tagihan_index, name='keuangan_tagihan_index'),
     path('tagihan-pasien/buat-tagihan/<int:id>', keuangan_views.buat_tagihan_index, name='buat_tagihan_index'),
     path('riwayat-pembayaran/', keuangan_views.keuangan_riwayat_index, name='keuangan_riwayat_index'),
+    path('riwayat-pembayaran/detail/<int:id>', keuangan_views.keuangan_riwayat_details, name='keuangan_riwayat_details'),
 ]
