@@ -1,7 +1,121 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from pelayanan.models import Kunjungan, RekamMedis, TindakanRekamMedis, TindakanMedis
+from pelayanan.models import Kunjungan, RekamMedis, TindakanMedis, TindakanRekamMedis
+
+
+class RawatPasienRepository:
+    @staticmethod
+    def get_kunjungan(dokter, kunjungan_id=None):
+        if kunjungan_id:
+            return Kunjungan.objects.select_related(
+                'pasien__user',
+                'jadwal__dokter__user',
+                'jadwal__poli'
+            ).filter(
+                id=kunjungan_id,
+                jadwal__dokter=dokter
+            ).first()
+
+        return (
+            Kunjungan.objects
+            .antrean_rawat(dokter)
+            .order_by('id')
+            .first()
+        )
+
+    @staticmethod
+    def get_tindakan_list():
+        return TindakanMedis.objects.order_by('nama_tindakan')
+
+    @staticmethod
+    def get_rekam_medis(kunjungan):
+        return RekamMedis.objects.filter(kunjungan=kunjungan).first()
+
+    @staticmethod
+    def get_selected_tindakan_ids(rekam_medis):
+        if not rekam_medis:
+            return []
+
+        return list(
+            TindakanRekamMedis.objects.filter(
+                rekam_medis=rekam_medis
+            ).values_list(
+                'tindakan_medis_id', 
+                flat=True
+            )
+        )
+
+    @staticmethod
+    def get_riwayat_rekam_medis(pasien, current_kunjungan):
+        return RekamMedis.objects.filter(
+            kunjungan__pasien=pasien
+        ).exclude(
+            kunjungan=current_kunjungan
+        ).order_by('-id')
+
+
+
+class RawatPasienService:
+    def __init__(self, kunjungan):
+        self.kunjungan = kunjungan
+
+    @staticmethod
+    def validate_input(keluhan, diagnosa, tekanan_darah, suhu_tubuh, tindakan_ids):
+        if not keluhan:
+            raise ValueError('Keluhan pasien wajib diisi.')
+
+        if not diagnosa:
+            raise ValueError('Diagnosa wajib diisi.')
+
+        if not tekanan_darah:
+            raise ValueError('Tekanan darah wajib diisi.')
+
+        if not suhu_tubuh:
+            raise ValueError('Suhu tubuh wajib diisi.')
+
+        if len(tindakan_ids) < 1:
+            raise ValueError('Minimal pilih 1 tindakan medis.')
+
+    def save_rekam_medis(self, keluhan, diagnosa, tekanan_darah, suhu_tubuh):
+        rekam_medis, created = (
+            RekamMedis.objects.get_or_create(
+                kunjungan=self.kunjungan,
+                defaults={
+                    'keluhan': keluhan,
+                    'diagnosa': diagnosa,
+                    'tekanan_darah': tekanan_darah,
+                    'suhu_tubuh': suhu_tubuh
+                }
+            )
+        )
+
+        if not created:
+            rekam_medis.update_pemeriksaan(keluhan=keluhan, diagnosa=diagnosa, tekanan_darah=tekanan_darah, suhu_tubuh=suhu_tubuh)
+
+        return rekam_medis
+
+    @staticmethod
+    def save_tindakan(rekam_medis, tindakan_ids):
+        TindakanRekamMedis.objects.filter(rekam_medis=rekam_medis).delete()
+        tindakan_list = (TindakanMedis.objects.filter(id__in=tindakan_ids))
+        tindakan_objects = []
+
+        for tindakan in tindakan_list:
+            tindakan_objects.append(TindakanRekamMedis(rekam_medis=rekam_medis, tindakan_medis=tindakan))
+
+        TindakanRekamMedis.objects.bulk_create(tindakan_objects)
+
+    def finalisasi(self, keluhan, diagnosa, tekanan_darah, suhu_tubuh, tindakan_ids):
+        self.validate_input(keluhan, diagnosa, tekanan_darah, suhu_tubuh, tindakan_ids)
+        rekam_medis = (self.save_rekam_medis(keluhan, diagnosa, tekanan_darah, suhu_tubuh))
+        self.save_tindakan(rekam_medis, tindakan_ids)
+
+        #polymorphism
+        self.kunjungan.move_next_status()
+        return rekam_medis
+
+
 
 @login_required
 def rawat_pasien_detail(request, kunjungan_id=None):
@@ -21,181 +135,103 @@ def rawat_pasien_detail(request, kunjungan_id=None):
         )
         return redirect('dashboard')
 
-    if kunjungan_id:
-        kunjungan = Kunjungan.objects.select_related(
-            'pasien__user',
-            'jadwal__dokter__user',
-            'jadwal__poli'
-        ).filter(
-            id=kunjungan_id,
-            jadwal__dokter = dokter
-        ).first()
+    kunjungan = (
+        RawatPasienRepository
+        .get_kunjungan(dokter, kunjungan_id)
+    )
 
-    else:
-        kunjungan = Kunjungan.objects.select_related(
-            'pasien__user',
-            'jadwal__dokter__user',
-            'jadwal__poli'
-        ).filter(
-            jadwal__dokter = dokter,
-            status__in=['diproses', 'rawat']
-        ).order_by('id').first()
-
-    if kunjungan and kunjungan.status == 'diproses':
-        kunjungan.status = 'rawat'
-        kunjungan.save()
-
+    if (kunjungan and kunjungan.status == 'diproses'):
+        kunjungan.move_next_status()
 
     if not kunjungan:
-        context = {
-            'page_title': 'Rawat Pasien',
-            'kunjungan': None,
-            'tindakan_list': [],
-            'riwayat_rekam_medis': [],
-        }
-
         return render(
             request,
             'pages/pelayanan/rawat_pasien/index.html',
-            context
-        )
+            {
+                'page_title':
+                    'Rawat Pasien',
 
-    tindakan_list = TindakanMedis.objects.all()
+                'kunjungan':
+                    None,
 
-    rekam_medis = RekamMedis.objects.filter(
-        kunjungan=kunjungan
-    ).first()
+                'tindakan_list':
+                    [],
 
-    selected_tindakan_ids = []
-
-    if rekam_medis:
-        selected_tindakan_ids = TindakanRekamMedis.objects.filter(
-            rekam_medis=rekam_medis
-        ).values_list(
-            'tindakan_medis_id',
-            flat=True
-        )
-
-    if request.method == 'POST':
-        keluhan = request.POST.get('keluhan', '').strip()
-        diagnosa = request.POST.get('diagnosa', '').strip()
-        tekanan_darah = request.POST.get('tekanan_darah', '').strip()
-        suhu_tubuh = request.POST.get('suhu_tubuh', '').strip()
-        tindakan_ids = request.POST.getlist('tindakan_ids')
-
-        if not keluhan:
-            messages.error(
-                request,
-                'Keluhan pasien wajib diisi.'
-            )
-
-            return redirect(
-                'rawat_pasien_detail',
-                kunjungan_id=kunjungan.id
-            )
-
-        if not diagnosa:
-            messages.error(
-                request,
-                'Diagnosa wajib diisi.'
-            )
-
-            return redirect(
-                'rawat_pasien_detail',
-                kunjungan_id=kunjungan.id
-            )
-
-        if not tekanan_darah:
-            messages.error(
-                request,
-                'Tekanan darah wajib diisi.'
-            )
-
-            return redirect(
-                'rawat_pasien_detail',
-                kunjungan_id=kunjungan.id
-            )
-
-        if not suhu_tubuh:
-            messages.error(
-                request,
-                'Suhu tubuh wajib diisi.'
-            )
-
-            return redirect(
-                'rawat_pasien_detail',
-                kunjungan_id=kunjungan.id
-            )
-
-        if len(tindakan_ids) < 1:
-            messages.error(
-                request,
-                'Minimal pilih 1 tindakan medis.'
-            )
-
-            return redirect(
-                'rawat_pasien_detail',
-                kunjungan_id=kunjungan.id
-            )
-
-        rekam_medis, created = RekamMedis.objects.get_or_create(
-            kunjungan=kunjungan,
-            defaults={
-                'keluhan': keluhan,
-                'diagnosa': diagnosa,
-                'tekanan_darah': tekanan_darah,
-                'suhu_tubuh': suhu_tubuh,
+                'riwayat_rekam_medis':
+                    []
             }
         )
 
-        if not created:
-            rekam_medis.keluhan = keluhan
-            rekam_medis.diagnosa = diagnosa
-            rekam_medis.tekanan_darah = tekanan_darah
-            rekam_medis.suhu_tubuh = suhu_tubuh
-            rekam_medis.save()
+    tindakan_list = (
+        RawatPasienRepository
+        .get_tindakan_list()
+    )
 
-        TindakanRekamMedis.objects.filter(
-            rekam_medis=rekam_medis
-        ).delete()
+    rekam_medis = (
+        RawatPasienRepository
+        .get_rekam_medis(kunjungan)
+    )
 
-        for tindakan_id in tindakan_ids:
-            tindakan = TindakanMedis.objects.get(
-                id=tindakan_id
+    selected_tindakan_ids = (
+        RawatPasienRepository
+        .get_selected_tindakan_ids(rekam_medis)
+    )
+
+    if request.method == 'POST':
+        try:
+            service = (RawatPasienService(kunjungan))
+            service.finalisasi(
+                keluhan=request.POST.get('keluhan', '').strip(),
+                diagnosa=request.POST.get('diagnosa', '').strip(),
+                tekanan_darah=request.POST.get('tekanan_darah', '').strip(),
+                suhu_tubuh=request.POST.get('suhu_tubuh', '').strip(),
+                tindakan_ids=request.POST.getlist('tindakan_ids')
             )
 
-            TindakanRekamMedis.objects.create(
-                rekam_medis=rekam_medis,
-                tindakan_medis=tindakan
+            messages.success(
+                request,
+                (
+                    'Data pemeriksaan '
+                    'berhasil disimpan.'
+                )
             )
 
+            return redirect(
+                'resep_obat_detail',
+                kunjungan_id=kunjungan.id
+            )
 
-        messages.success(
-            request,
-            'Data pemeriksaan berhasil disimpan.'
-        )
+        except ValueError as e:
+            messages.error(request, str(e))
 
-        kunjungan.status = 'resep'
-        kunjungan.save()
+            return redirect(
+                'rawat_pasien_detail',
+                kunjungan_id=kunjungan.id
+            )
 
-        return redirect(
-            'resep_obat_detail',
-            kunjungan_id=kunjungan.id
-        )
-
-    riwayat_rekam_medis = RekamMedis.objects.filter(
-        kunjungan__pasien=kunjungan.pasien
-    ).exclude(
-        kunjungan=kunjungan
-    ).order_by('-id')
+    riwayat_rekam_medis = (
+        RawatPasienRepository
+        .get_riwayat_rekam_medis(kunjungan.pasien, kunjungan)
+    )
 
     context = {
-        'page_title': 'Rawat Pasien',
-        'kunjungan': kunjungan,
-        'tindakan_list': tindakan_list,
-        'riwayat_rekam_medis': riwayat_rekam_medis,
-        'rekam_medis': rekam_medis,
-        'selected_tindakan_ids': selected_tindakan_ids,
+        'page_title':
+            'Rawat Pasien',
+
+        'kunjungan':
+            kunjungan,
+
+        'tindakan_list':
+            tindakan_list,
+
+        'riwayat_rekam_medis':
+            riwayat_rekam_medis,
+
+        'rekam_medis':
+            rekam_medis,
+
+        'selected_tindakan_ids':
+            selected_tindakan_ids
     }
 
     return render(
@@ -203,4 +239,3 @@ def rawat_pasien_detail(request, kunjungan_id=None):
         'pages/pelayanan/rawat_pasien/index.html',
         context
     )
-
