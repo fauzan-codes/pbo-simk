@@ -72,6 +72,8 @@ urlpatterns = [
     path('obat/', farmasi_views.stok_obat_index, name="stok_obat_index"),
     path('obat/create', farmasi_views.stok_obat_create, name="stok_obat_create"),
     path('stok-obat/<int:id>/edit/', farmasi_views.stok_obat_edit, name='stok_obat_edit'),
+    path('farmasi/stok-obat/<int:id>/tambah/', farmasi_views.stok_obat_tambah, name='stok_obat_tambah'),
+    path('farmasi/stok-obat/<int:id>/kurangi/', farmasi_views.stok_obat_kurangi, name='stok_obat_kurangi'),
     path('obat/<int:id>/delete', farmasi_views.stok_obat_delete, name="stok_obat_delete"),
 
     path('konfirmasi-resep/', farmasi_views.konfirmasi_resep_index, name="konfirmasi_resep_index"),

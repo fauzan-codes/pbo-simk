@@ -15,19 +15,21 @@
         <div class="grid grid-cols-6 gap-x-6 gap-y-4">
             
             <div class="md:col-span-3 col-span-6 flex flex-col gap-y-4">
-                {% include 'components/ui/input.html' with label="Input Nama" name="nama_obat" type="text" placeholder="Masukkan nama obat" required=True %}
+                {% include 'components/ui/input.html' with label="Nama Obat" name="nama_obat" type="text" placeholder="Masukkan nama obat" required=True %}
                 
-                {% include 'components/ui/select.html' with label="Kategori Obat" name="kategori" placeholder="-- Select Kategori dari tabel kategori_obat --" required=True options=kategori_options %}
+                {% include 'components/ui/select.html' with label="Kategori Obat" name="kategori" placeholder="-- Pilih Kategori --" required=True options=kategori_options %}
                 
-                {% include 'components/ui/input.html' with label="Input Stock" name="stok" type="number" placeholder="Masukkan jumlah stok" required=True %}
+                {% include 'components/ui/input.html' with label="Harga Beli" name="harga_beli" type="number" placeholder="Masukkan harga beli" step="0.01" %}
             </div>
             
             <div class="md:col-span-3 col-span-6 flex flex-col gap-y-4">
-                {% include 'components/ui/input.html' with label="Input Kode Obat" name="kode_obat" type="text" placeholder="Masukkan kode obat" required=True %}
+                <!-- ✅ Remove: Kode Obat Manual (Auto-generate!) -->
                 
-                {% include 'components/ui/input.html' with label="Input Satuan" name="satuan" type="text" placeholder="Contoh: Tablet, Botol, Pcs" required=True %}
+                {% include 'components/ui/input.html' with label="Satuan" name="satuan" type="text" placeholder="Contoh: Tablet, Botol, Pcs" required=True %}
                 
-                {% include 'components/ui/input.html' with label="Input Harga Jual" name="harga" type="number" placeholder="Masukkan harga jual" required=True %}
+                {% include 'components/ui/input.html' with label="Harga Jual" name="harga" type="number" placeholder="Masukkan harga jual" step="0.01" required=True %}
+                
+                {% include 'components/ui/input.html' with label="Tanggal Kadaluarsa" name="tanggal_kadaluarsa" type="date" %}
             </div>
 
         </div>
@@ -38,5 +40,11 @@
             {% include 'components/ui/button.html' with label="Submit" type="submit" variant="primary" %}
         </div>
     </form>
+</div>
+
+<div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+    <p class="text-sm text-blue-700">
+        <strong>ℹ️ Info:</strong> Kode obat akan otomatis digenerate dalam format <code class="bg-blue-100 px-2 py-1 rounded">OBT-xxxx</code> saat Anda menyimpan data.
+    </p>
 </div>
 {% endblock %}

@@ -279,7 +279,7 @@ class Command(BaseCommand):
         for nama, kode, kategori_idx, satuan, stok, harga in obat_data:
             Obat.objects.create(
                 nama_obat=nama,
-                kode_obat=kode,
+                # kode_obat=kode,
                 kategori=kategori_list[kategori_idx],
                 satuan=satuan,
                 stok=stok,
@@ -380,7 +380,7 @@ class Command(BaseCommand):
                 total_biaya_obat=total_obat,
                 grand_total=grand_total,
                 metode_bayar=metode_pembayaran,
-                status_pembayaran='lunas',
+                # status_pembayaran='lunas',
                 waktu_pembayaran=timezone.now()
             )
         

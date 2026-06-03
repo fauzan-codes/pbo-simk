@@ -8,37 +8,126 @@
     {% include 'components/ui/breadcrumbs.html' %}
 </div>
 
-<div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
-    <form method="POST" class="flex flex-col">
-        {% csrf_token %}
-        
-        <div class="grid grid-cols-6 gap-x-6 gap-y-4">
+<!-- ✅ INFO CARD -->
+<div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+    <p class="text-sm text-blue-700">
+        <strong>ℹ️ Info:</strong> Gunakan tombol <strong>+ Tambah</strong> dan <strong>- Kurangi</strong> di tabel untuk mengubah stok. Form ini hanya untuk mengubah informasi obat lainnya.
+    </p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Main Form -->
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 lg:p-8">
+            <form method="POST" class="flex flex-col">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-6 gap-x-6 gap-y-4">
+                    
+                    <div class="md:col-span-3 col-span-6 flex flex-col gap-y-4">
+                        {% include 'components/ui/input.html' with label="Nama Obat" name="nama_obat" type="text" placeholder="Masukkan nama obat" value=obat.nama_obat required=True %}
+                        
+                        {% include 'components/ui/select.html' with label="Kategori Obat" name="kategori" placeholder="-- Pilih Kategori --" required=True options=kategori_options selected_value=obat.kategori_id %}
+                        
+                        {% include 'components/ui/input.html' with label="Harga Beli" name="harga_beli" type="number" placeholder="Masukkan harga beli" value=obat.harga_beli step="0.01" %}
+                    </div>
+                    
+                    <div class="md:col-span-3 col-span-6 flex flex-col gap-y-4">
+                        <!-- ✅ Remove: Kode Obat (Already auto-generated) -->
+                        
+                        {% include 'components/ui/input.html' with label="Satuan" name="satuan" type="text" placeholder="Contoh: Tablet, Botol, Pcs" value=obat.satuan required=True %}
+                        
+                        {% include 'components/ui/input.html' with label="Harga Jual" name="harga" type="number" placeholder="Masukkan harga jual" value=obat.harga_jual step="0.01" required=True %}
+                        
+                        {% include 'components/ui/input.html' with label="Tanggal Kadaluarsa" name="tanggal_kadaluarsa" type="date" value=obat.tanggal_kadaluarsa %}
+                    </div>
+
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-slate-100">
+                    <a href="{% url 'stok_obat_index' %}" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">
+                        Batal
+                    </a>
+
+                    {% include 'components/ui/button.html' with label="Update" type="submit" variant="primary" %}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- ✅ INFO CARD: Display Computed Properties -->
+    <div class="lg:col-span-1">
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
+            <h3 class="font-semibold text-slate-800 mb-4">📊 Informasi Obat</h3>
             
-            <div class="md:col-span-3 col-span-6 flex flex-col gap-y-4">
-                {% include 'components/ui/input.html' with label="Input Nama" name="nama_obat" type="text" placeholder="Masukkan nama obat" value=obat.nama_obat required=True %}
-                
-                {% include 'components/ui/select.html' with label="Kategori Obat" name="kategori" placeholder="-- Select Kategori dari tabel kategori_obat --" required=True options=kategori_options selected_value=obat.kategori_id %}
-                
-                {% include 'components/ui/input.html' with label="Input Stock" name="stok" type="number" placeholder="Masukkan jumlah stok" value=obat.stok required=True %}
+            <!-- Kode Entity (Auto-generated) -->
+            <div class="mb-4">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Kode Obat (Auto)</p>
+                <p class="font-mono text-sm font-bold text-slate-700 mt-1">{{ obat.kode_entity }}</p>
             </div>
             
-            <div class="md:col-span-3 col-span-6 flex flex-col gap-y-4">
-                {% include 'components/ui/input.html' with label="Input Kode Obat" name="kode_obat" type="text" placeholder="Masukkan kode obat" value=obat.kode_obat required=True %}
-                
-                {% include 'components/ui/input.html' with label="Input Satuan" name="satuan" type="text" placeholder="Contoh: Tablet, Botol, Pcs" value=obat.satuan required=True %}
-                
-                {% include 'components/ui/input.html' with label="Input Harga Jual" name="harga" type="number" placeholder="Masukkan harga jual" value=obat.harga_jual required=True %}
+            <!-- Stok -->
+            <div class="mb-4 pb-4 border-b border-slate-100">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Stok Saat Ini</p>
+                <p class="text-2xl font-bold text-slate-700 mt-1">{{ obat.stok }} {{ obat.satuan }}</p>
             </div>
-
+            
+            <!-- ✅ Computed Property: stok_rendah -->
+            <div class="mb-4">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Status Stok</p>
+                <div class="mt-1">
+                    {% if obat.stok_rendah %}
+                        <span class="inline-block px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-bold border border-amber-200">
+                            ⚠️ RENDAH
+                        </span>
+                    {% elif obat.is_kadaluarsa %}
+                        <span class="inline-block px-3 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-bold border border-red-200">
+                            🚫 EXPIRED
+                        </span>
+                    {% else %}
+                        <span class="inline-block px-3 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-200">
+                            ✓ AMAN
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- ✅ Computed Property: nilai_stok -->
+            <div class="mb-4">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Nilai Stok</p>
+                <p class="text-lg font-bold text-green-600 mt-1">
+                    {% if obat.nilai_stok %}
+                        Rp {{ obat.nilai_stok|floatformat:0 }}
+                    {% else %}
+                        Rp 0
+                    {% endif %}
+                </p>
+            </div>
+            
+            <!-- ✅ Computed Property: margin_keuntungan -->
+            <div class="mb-4 pb-4 border-b border-slate-100">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Margin Keuntungan</p>
+                <p class="text-lg font-bold text-blue-600 mt-1">
+                    {% if obat.margin_keuntungan %}
+                        {{ obat.margin_keuntungan|floatformat:1 }}%
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+            </div>
+            
+            <!-- Kategori -->
+            <div class="mb-4">
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Kategori</p>
+                <p class="text-sm font-semibold text-slate-700 mt-1">{{ obat.kategori.nama_kategori }}</p>
+            </div>
+            
+            <!-- Satuan -->
+            <div>
+                <p class="text-xs text-slate-500 uppercase tracking-wide">Satuan</p>
+                <p class="text-sm font-semibold text-slate-700 mt-1">{{ obat.satuan }}</p>
+            </div>
         </div>
-
-        <div class="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-slate-100">
-            <a href="{% url 'stok_obat_index' %}" class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition">
-                Batal
-            </a>
-
-            {% include 'components/ui/button.html' with label="Update" type="submit" variant="primary" %}
-        </div>
-    </form>
+    </div>
 </div>
 {% endblock %}
