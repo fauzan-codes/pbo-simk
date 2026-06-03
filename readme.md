@@ -93,11 +93,79 @@ http://localhost:8000
 
 ---
 
-## 📸 Screenshot Tampilan Program
+## 📸 Screenshot & Fitur Per Role
 
-### Halaman Login
-![Login Page](static/screenshots/login.png)
+### 🔓 Guest (Belum Login)
+| | |
+|---|---|
+| ![Guest 1](screenshoot/guest/1.png) | ![Guest 2](screenshoot/guest/2.png) |
+| ![Guest 3](screenshoot/guest/3.png) | |
 
-*Screenshot akan ditambahkan kemudian*
+**Fitur:** Halaman login, register, dashboard publik
+
+---
+
+### 👨‍⚕️ Dokter
+| | |
+|---|---|
+| ![Dokter 1](screenshoot/dokter/1.png) | ![Dokter 2](screenshoot/dokter/2.png) |
+| ![Dokter 3](screenshoot/dokter/3.png) | ![Dokter 4](screenshoot/dokter/4.png) |
+| ![Dokter 5](screenshoot/dokter/5.png) | |
+
+**Fitur:** Kelola jadwal praktik, input form pelayanan, resep obat, riwayat tindakan pasien
+
+---
+
+### 🧑‍💼 Admin
+| | |
+|---|---|
+| ![Admin 1](screenshoot/admin/1.png) | ![Admin 2](screenshoot/admin/2.png) |
+| ![Admin 3](screenshoot/admin/3.png) | ![Admin 4](screenshoot/admin/4.png) |
+| ![Admin 5](screenshoot/admin/5.png) | ![Admin 6](screenshoot/admin/6.png) |
+
+**Fitur:** Manajemen user, poli, jadwal, loket, dashboard analytics
+
+---
+
+### 👤 Pasien
+| | |
+|---|---|
+| ![Pasien 1](screenshoot/pasien/1.png) | ![Pasien 2](screenshoot/pasien/2.png) |
+| ![Pasien 3](screenshoot/pasien/3.png) | |
+
+**Fitur:** Lihat rekam medis, riwayat tindakan, riwayat resep, profil
+
+---
+
+### 👨‍💼 Staff Administrasi
+| | |
+|---|---|
+| ![Staff Admin 1](screenshoot/staff/administrasi/1.png) | ![Staff Admin 2](screenshoot/staff/administrasi/2.png) |
+| ![Staff Admin 3](screenshoot/staff/administrasi/3.png) | ![Staff Admin 4](screenshoot/staff/administrasi/4.png) |
+| ![Staff Admin 5](screenshoot/staff/administrasi/5.png) | ![Staff Admin 6](screenshoot/staff/administrasi/6.png) |
+| ![Staff Admin 7](screenshoot/staff/administrasi/7.png) | ![Staff Admin 8](screenshoot/staff/administrasi/8.png) |
+
+**Fitur:** Manajemen poli, jadwal praktik, loket, tiket antrean, verifikasi pasien baru
+
+---
+
+### 💊 Staff Apoteker
+| | |
+|---|---|
+| ![Apoteker 1](screenshoot/staff/apoteker/1.png) | ![Apoteker 2](screenshoot/staff/apoteker/2.png) |
+| ![Apoteker 3](screenshoot/staff/apoteker/3.png) | ![Apoteker 4](screenshoot/staff/apoteker/4.png) |
+
+**Fitur:** Kelola stok obat, konfirmasi resep dokter, riwayat obat terjual
+
+---
+
+### 💰 Staff Kasir
+| | |
+|---|---|
+| ![Kasir 1](screenshoot/staff/kasir/1.png) | ![Kasir 2](screenshoot/staff/kasir/2.png) |
+| ![Kasir 3](screenshoot/staff/kasir/3.png) | ![Kasir 4](screenshoot/staff/kasir/4.png) |
+| ![Kasir 5](screenshoot/staff/kasir/5.png) | |
+
+**Fitur:** Input pembayaran, generate invoice, riwayat transaksi, kelola metode pembayaran
 
 ---
