@@ -1,0 +1,104 @@
+{% extends 'layouts/main.html' %}
+
+{% load custom_filters %}
+
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="mx-auto max-w-4xl">
+    <div class="flex items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 mb-2">{{ page_title }}</h1>
+            {% include 'components/ui/breadcrumbs.html' %}  
+        </div>
+    </div>
+
+    {% csrf_token %}
+    
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-8 sm:p-10 border-b border-slate-200 bg-slate-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+            <div>
+                <h2 class="text-3xl font-black text-sky-600 tracking-tight">INVOICE</h2>
+                <p class="text-sm text-slate-500 mt-1">Nomor Invoice: <span class="font-bold text-slate-700">{{ data_tagihan.nomor_invoice }}</span></p>
+            </div>
+            <div class="text-left sm:text-right">
+                <p class="text-sm font-semibold text-slate-800">Tanggal Kunjungan</p>
+                <p class="text-sm text-slate-500">{{ data_tagihan.kunjungan.tanggal_kunjungan }}</p>
+            </div>
+        </div>
+
+        <div class="p-8 sm:p-10">
+            <div class="mb-10">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Tagihan Kepada:</p>
+                <p class="text-lg font-bold text-slate-800">{{ data_tagihan.kunjungan.pasien.user.full_name }}</p>
+                </div>
+
+            <div class="overflow-x-auto mb-10">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="border-b-2 border-slate-200 text-slate-800">
+                        <tr>
+                            <th scope="col" class="pb-3 font-semibold">Deskripsi Layanan & Obat</th>
+                            <th scope="col" class="pb-3 font-semibold text-right w-32">Harga</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        
+                        <tr>
+                            <td colspan="2" class="py-4 pl-4 font-bold text-slate-800 bg-slate-50/50">Tindakan Medis</td>
+                        </tr>
+                        {% for tindakan in daftar_tindakan %}
+                        <tr>
+                            <td class="py-3 pr-4 pl-4 text-slate-700">{{ tindakan.tindakan_medis.nama_tindakan }}</td>
+                            <td class="py-3 text-right tabular-nums">{{ tindakan.tindakan_medis.tarif|rupiah }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="py-3 pr-4 pl-4 text-slate-500 italic">Tidak ada tindakan medis</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="2" class="py-4 pl-4 font-bold text-slate-800 bg-slate-50/50 mt-4">Resep Obat</td>
+                        </tr>
+                        {% for detail in daftar_obat %}
+                        <tr>
+                            <td class="py-3 pr-4 pl-4 text-slate-700">
+                                {{ detail.obat.kategori.nama_kategori }} - {{ detail.obat.kode_obat }} 
+                                <span class="text-slate-400">({{ detail.jumlah_diminta }} {{ detail.obat.satuan }})</span>
+                            </td>
+                            <td class="py-3 text-right tabular-nums">{{ detail.subtotal_harga|rupiah }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="py-3 pr-4 pl-4 text-slate-500 italic">Tidak ada resep obat</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                </table>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-end items-end gap-8 pt-6 border-t border-slate-200">
+                <div class="w-full md:w-1/2 lg:w-1/3 space-y-3 text-sm">
+                    <div class="flex justify-between text-slate-500">
+                        <span>Subtotal Tindakan</span>
+                        <span class="tabular-nums">{{ data_tagihan.total_biaya_tindakan|rupiah }}</span>
+                    </div>
+                    <div class="flex justify-between text-slate-500">
+                        <span>Subtotal Obat</span>
+                        <span class="tabular-nums">{{ data_tagihan.total_biaya_obat|rupiah }}</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg text-slate-800 pt-3 border-t border-slate-200">
+                        <span>Total Tagihan</span>
+                        <span class="text-sky-600 tabular-nums">{{ data_tagihan.grand_total|rupiah }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-12 pt-6 border-t border-slate-100 flex justify-end gap-3">
+                <a href="{% url 'keuangan_riwayat_index' %}">
+                    {% include 'components/ui/button.html' with type="button" variant="primary" label="Kembali" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

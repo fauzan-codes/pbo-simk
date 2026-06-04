@@ -31,6 +31,24 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Dibuat Pada</p>
+                        <p class="text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+                            {{ dokter.dibuat_pada|date:"d F Y, H:i" }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1">Terakhir Diperbarui</p>
+                        <p class="text-sm text-slate-600 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+                            {{ dokter.diperbarui_pada|date:"d F Y, H:i"|default:"-" }}
+                        </p>
+                    </div>
+                </div>
+            </div>               
+
         </div>
 
         <div class="lg:col-span-2 space-y-6">

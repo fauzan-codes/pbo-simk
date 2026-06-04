@@ -142,9 +142,9 @@
                                     Harga
                                 </th>
 
-                                {% comment %} <th class="pb-4 font-semibold uppercase tracking-wider">
+                                <th class="pb-4 font-semibold uppercase tracking-wider">
                                     Kode Obat
-                                </th> {% endcomment %}
+                                </th> 
 
                                 <th class="pb-4 font-semibold uppercase tracking-wider">
                                     Stok
@@ -162,7 +162,7 @@
                                             type="checkbox"
                                             name="obat_ids"
                                             value="{{ obat.id }}"
-                                            data-nama="{{ obat.kode_obat }}"
+                                            data-nama="{{ obat.nama_obat }}"
                                             data-harga="{{ obat.harga_jual }}"
                                             class="obat-checkbox w-5 h-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                                         >
@@ -178,7 +178,7 @@
                                 <td class="py-4">
                                     <div>
                                         <p class="font-semibold text-slate-700">
-                                            {{ obat.kode_obat }}
+                                            {{ obat.nama_obat }}
                                         </p>
                                     </div>
                                 </td>
@@ -195,11 +195,11 @@
                                     </p>
                                 </td>
 
-                                {% comment %} <td class="py-4">
+                                <td class="py-4">
                                     <p class="font-semibold text-slate-700">
-                                        {{ obat.kategori_id }}
+                                        {{ obat.kode_obat }}
                                     </p>
-                                </td> {% endcomment %}
+                                </td> 
 
                                 <td class="py-4">
                                     {% if obat.stok > 10 %}

@@ -1,5 +1,7 @@
 {% extends 'layouts/main.html' %}
 
+{% load custom_filters %}
+
 {% block page_title %}{{ page_title }}{% endblock %}
 
 {% block dashboard_content %}
@@ -37,7 +39,7 @@
                 </td>
                 <td class="py-4 text-slate-600">
                     <p class="font-semibold text-slate-700">
-                        {{ item.grand_total }}
+                        {{ item.grand_total|rupiah }}
                     </p>
                 </td>
                 <td class="py-4">
@@ -52,8 +54,8 @@
                 </td>
                 <td class="py-4">
                     <div class="flex justify-center items-center gap-2">
-                        <a href="{% url 'keuangan_tagihan_index' %}">
-                            {% include 'components/ui/button.html' with variant='primary' label='Buat Tagihan' %}
+                        <a href="{% url 'keuangan_riwayat_details' item.id %}">
+                            {% include 'components/ui/button.html' with variant='primary' label='Detail' %}
                         </a>
                     </div>
                 </td>

@@ -28,7 +28,6 @@
                     {% include 'components/ui/input.html' with label="Password" type="password" name="password" required=True help_text="Gunakan minimal 8 karakter campuran." value=form.password.value|default:'' %}
                 </div>
             </div>
-
             {% include 'components/ui/alert.html' with variant="info" title="Informasi SIP" message="Pastikan Nomor SIP (Surat Izin Praktik) valid dan sesuai dengan dokumen resmi untuk keperluan administrasi rekam medis." %}
         </div>
 

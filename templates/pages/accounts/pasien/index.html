@@ -18,8 +18,8 @@
     <table id="pasienTable" class="w-full text-sm text-left">
         <thead>
             <tr class="text-slate-400 border-b border-slate-100">
-                <th class="pb-4 font-semibold uppercase tracking-wider">Nama & NIK</th>
-                <th class="pb-4 font-semibold uppercase tracking-wider">No. Rekam Medis</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Nama & No. RM</th>
+                <th class="pb-4 font-semibold uppercase tracking-wider">Usia</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider">Jenis Kelamin</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider">Kontak</th>
                 <th class="pb-4 font-semibold uppercase tracking-wider">Email</th>
@@ -33,13 +33,13 @@
                     <div class="flex items-center gap-3">
                         <div>
                             <p class="font-semibold text-slate-700">{{ user.full_name }}</p>
-                            <p class="text-[10px] font-mono text-slate-400">NIK: {{ user.pasien_profile.nik|default:"-" }}</p>
+                            <p class="text-[10px] font-mono text-slate-400">RM: {{ user.pasien_profile.nomor_rekam_medis }}</p>
                         </div>
                     </div>
                 </td>
                 <td class="py-4">
                     <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-xs font-bold border border-blue-100">
-                        {{ user.pasien_profile.nomor_rekam_medis }}
+                        {{ user.pasien_profile.umur }} Thn
                     </span>
                 </td>
                 <td class="py-4">
