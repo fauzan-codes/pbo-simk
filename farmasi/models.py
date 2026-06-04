@@ -42,21 +42,6 @@ class Obat(TimestampModel):
     class Meta:
         db_table = 'obat'
     
-    def __generate_kode_obat(self):
-        kategori_prefix = self.kategori.nama_kategori[:3].upper()
-        
-        last_obat = Obat.objects.filter(
-            kategori=self.kategori
-        ).order_by('id').last()
-        
-        if last_obat and last_obat.kode_obat:
-            last_number = int(last_obat.kode_obat[-3:])
-            next_number = last_number + 1
-        else:
-            next_number = 1
-        
-        return f"OBT-{kategori_prefix}-{next_number:03d}"
-    
     def save(self, *args, **kwargs):
         if not self.kode_obat:
             self.kode_obat = self.__generate_kode_obat()
