@@ -57,7 +57,7 @@ db.sqlite3-journal
 *.sublime-workspace
 
 # Environment variables
-.env
+# .env
 .env.local
 .env.*.local
 
