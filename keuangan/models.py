@@ -28,13 +28,12 @@ class Tagihan(TimestampModel):
             self.nomor_invoice = self.__generate_nomor_invoice()
         super().save(*args, **kwargs)
 
-    @classmethod
-    def __generate_nomor_invoice(cls):
+    def __generate_nomor_invoice(self):
         hari_ini = timezone.now().date()
         tanggal_str = hari_ini.strftime('%Y%m%d')
         prefix = f"INV-{tanggal_str}-"
 
-        last_invoice = cls.objects.filter(nomor_invoice__startswith=prefix).order_by('-nomor_invoice').first()
+        last_invoice = Tagihan.objects.filter(nomor_invoice__startswith=prefix).order_by('-nomor_invoice').first()
 
         if last_invoice:
             try:

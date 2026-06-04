@@ -28,7 +28,6 @@ Sistem Informasi Manajemen Klinik (SIMK) adalah aplikasi berbasis web yang diban
    4)	Sistem antrean dan pemanggilan pasien berdasarkan antrean
    5)	Display monitor untuk menampilkan antrean saat ini
 
-
 ### 3. **Pelayanan**
    1)	Manajemen data tindakan (create, read, update, delete)
    2)	Form Pelayanan: input data keluhan & diagnosa
@@ -45,7 +44,6 @@ Sistem Informasi Manajemen Klinik (SIMK) adalah aplikasi berbasis web yang diban
    1)	Manajemen metode pembayaran (create, read, update, delete)
    2)	Create data tagihan pasien (generate invoice)
    3)	Riwayat pembayaran pasien
-
 
 
 ## 🚀 Cara Menjalankan Project
@@ -107,7 +105,7 @@ class TimestampModel(models.Model):
         abstract = True
 ```
 - Semua model (Poli, JadwalPraktik, Tiket, Loket, TindakanMedis, Kunjungan, dll) mewarisi dari `TimestampModel`
-- Memberikan audit trail otomatis untuk setiap entitas yang dibuat atau diperbarui
+- Memberikan catatan waktu otomatis untuk setiap entitas yang dibuat atau diperbarui
 
 #### b. Hirarki User Profile
 Hierarki inheritance untuk profil pengguna di `accounts/models.py`:
@@ -172,6 +170,29 @@ def move_next_status(self):
 
 #### b. Method Override
 Setiap subclass override method `get_identitas()` dengan implementasi unik:
+```python
+class UserProfileModel(TimestampModel):
+    # Method abstrak (harus di implementasikan oleh subclass)
+    def get_identitas(self):
+        raise NotImplementedError(f"{self.__class__.__name__} harus implementasi _get_identitas()")
+
+class Dokter(UserProfileModel):
+    # Override oleh subclass dokter
+    def get_identitas(self):
+        return f"{self.user.full_name} (Dokter {self.spesialisasi})"
+
+class Staff(UserProfileModel):
+    # Override oleh subclass staff
+    def get_identitas(self):
+        return f"{self.user.full_name} ({self.jabatan})"
+
+class Pasien(UserProfileModel):
+    # Override oleh subclass pasien
+    def get_identitas(self):
+        return f"{self.nomor_rekam_medis} - {self.user.full_name}")
+    
+
+```
 - Dokter: menampilkan nama + spesialisasi
 - Staff: menampilkan nama + jabatan
 - Pasien: menampilkan nomor rekam medis + nama
@@ -193,6 +214,25 @@ class KunjunganManager(models.Manager):
 
 #### b. Private Methods
 Penggunaan private methods (prefix `__`) untuk operasi internal:
+
+```python
+def __generate_kode_obat(self):
+    today_str = timezone.now().strftime('%Y%m%d')
+    prefix = f"OBT-{today_str}-"
+    
+    last_obat = Obat.objects.filter(
+        kode_obat__startswith=prefix
+    ).order_by('-kode_obat').first()
+    
+    if last_obat:
+        last_number = int(last_obat.kode_obat.split('-')[-1])
+        new_number = str(last_number + 1).zfill(3)
+    else:
+        new_number = "001"
+        
+    return f"{prefix}{new_number}"
+```
+
 - `Pasien.__generate_nomor_rm()` - generate nomor rekam medis
 - `Tiket.__generate_no_tiket()` - generate nomor tiket
 - `TindakanMedis.__generate_kode_tindakan()` - generate kode tindakan
@@ -214,6 +254,12 @@ def save(self, *args, **kwargs):
 ### 4. **Abstraction (Abstraksi)**
 
 #### a. Abstract Base Classes
+```python
+# Mencegah django membuat otomatis object migrasi ke database
+ class Meta:
+    abstract = True
+```
+
 - `TimestampModel` - abstraksi untuk timestamp fields
 - `UserProfileModel` - abstraksi untuk profil pengguna
 - `BaseMedicalRecord` - abstraksi untuk validasi medical records

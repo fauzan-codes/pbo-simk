@@ -132,6 +132,45 @@
             <span class="text-sm font-medium">Resep Obat</span>
         </a>
     {% endif %}
+
+{% comment %} Farmasi {% endcomment %}
+    {% if request.user.role == 'admin' or request.user.role == 'staff' and request.user.staff_profile.jabatan == 'Apoteker' %}
+        <p class="px-4 py-2 text-[10px] font-bold text-white/30 uppercase tracking-widest">Farmasi</p>
+
+        <a href="{% url 'kategori_obat_index' %}" 
+        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group
+        {% if page_title == 'Kategori Obat' %} bg-white/10 text-white {% else %} text-white/70 hover:bg-white/10 {% endif %}">
+            
+            <svg class="w-5 h-5 {% if page_title == 'Kategori Obat' %} text-sky-400 {% else %} text-white/40 group-hover:text-sky-400 {% endif %}" 
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+            </svg>
+            <span class="text-sm font-medium">Kategori Obat</span>
+        </a>
+
+        <a href="{% url 'stok_obat_index' %}" 
+        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group
+        {% if page_title == 'Stok Obat' %} bg-white/10 text-white {% else %} text-white/70 hover:bg-white/10 {% endif %}">
+            
+            <svg class="w-5 h-5 {% if page_title == 'Stok Obat' %} text-sky-400 {% else %} text-white/40 group-hover:text-sky-400 {% endif %}" 
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+            </svg>
+            <span class="text-sm font-medium">Stok Obat</span>
+        </a>
+
+        <a href="{% url 'konfirmasi_resep_index' %}" 
+        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group
+        {% if page_title == 'Konfirmasi Resep Doker' %} bg-white/10 text-white {% else %} text-white/70 hover:bg-white/10 {% endif %}">
+            
+            <svg class="w-5 h-5 {% if page_title == 'Konfirmasi Resep Doker' %} text-sky-400 {% else %} text-white/40 group-hover:text-sky-400 {% endif %}" 
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
+            </svg>
+            <span class="text-sm font-medium">Konfirmasi Resep</span>
+        </a>
+    {% endif %}
         
         {% comment %} Keuangan {% endcomment %}
     {% if request.user.role == 'admin' or request.user.role == 'staff' and request.user.staff_profile.jabatan == 'Kasir' %}
@@ -168,45 +207,6 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
             </svg>
             <span class="text-sm font-medium">Riwayat Pembayaran</span>
-        </a>
-    {% endif %}
-
-        {% comment %} Farmasi {% endcomment %}
-    {% if request.user.role == 'admin' or request.user.role == 'staff' and request.user.staff_profile.jabatan == 'Apoteker' %}
-        <p class="px-4 py-2 text-[10px] font-bold text-white/30 uppercase tracking-widest">Farmasi</p>
-
-        <a href="{% url 'kategori_obat_index' %}" 
-        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group
-        {% if page_title == 'Kategori Obat' %} bg-white/10 text-white {% else %} text-white/70 hover:bg-white/10 {% endif %}">
-            
-            <svg class="w-5 h-5 {% if page_title == 'Kategori Obat' %} text-sky-400 {% else %} text-white/40 group-hover:text-sky-400 {% endif %}" 
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
-            </svg>
-            <span class="text-sm font-medium">Kategori Obat</span>
-        </a>
-
-        <a href="{% url 'stok_obat_index' %}" 
-        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group
-        {% if page_title == 'Stok Obat' %} bg-white/10 text-white {% else %} text-white/70 hover:bg-white/10 {% endif %}">
-            
-            <svg class="w-5 h-5 {% if page_title == 'Stok Obat' %} text-sky-400 {% else %} text-white/40 group-hover:text-sky-400 {% endif %}" 
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-            </svg>
-            <span class="text-sm font-medium">Stok Obat</span>
-        </a>
-
-        <a href="{% url 'konfirmasi_resep_index' %}" 
-        class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group
-        {% if page_title == 'Konfirmasi Resep Doker' %} bg-white/10 text-white {% else %} text-white/70 hover:bg-white/10 {% endif %}">
-            
-            <svg class="w-5 h-5 {% if page_title == 'Konfirmasi Resep Doker' %} text-sky-400 {% else %} text-white/40 group-hover:text-sky-400 {% endif %}" 
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0 1 18 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3 1.5 1.5 3-3.75" />
-            </svg>
-            <span class="text-sm font-medium">Konfirmasi Resep</span>
         </a>
     {% endif %}
 
